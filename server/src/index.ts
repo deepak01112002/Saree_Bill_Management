@@ -24,6 +24,7 @@ import stockAuditRoutes from './routes/stockAudit';
 import reportsRoutes from './routes/reports';
 import settingsRoutes from './routes/settings';
 import fittingsRoutes from './routes/fittings';
+import rollPolishRoutes from './routes/rollPolish';
 
 const app = express();
 const PORT = process.env.PORT || 5001; // Changed to 5001 to avoid AirPlay conflict
@@ -100,6 +101,7 @@ app.use('/api/stock-audit', stockAuditRoutes);
 app.use('/api/reports', reportsRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/fittings', fittingsRoutes);
+app.use('/api/roll-polish', rollPolishRoutes);
 
 // 404 handler
 app.use((req, res) => {

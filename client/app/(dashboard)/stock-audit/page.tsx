@@ -142,7 +142,7 @@ export default function StockAuditPage() {
           `${result.item.productName}: +${result.item.difference} (System: ${result.item.systemStock}, Physical: ${result.item.physicalStock})`
         );
       } else {
-        showToast.warning(
+        showToast.info(
           `${result.item.productName}: ${result.item.difference} (System: ${result.item.systemStock}, Physical: ${result.item.physicalStock})`
         );
       }

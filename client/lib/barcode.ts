@@ -26,12 +26,18 @@ export function generateBarcodeDataURL(
     format?: string;
     width?: number;
     height?: number;
+    displayValue?: boolean;
   }
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas');
     try {
-      generateBarcode(canvas, data, options);
+      generateBarcode(canvas, data, {
+        format: options?.format,
+        width: options?.width,
+        height: options?.height,
+        displayValue: options?.displayValue !== false,
+      });
       resolve(canvas.toDataURL('image/png'));
     } catch (error) {
       reject(error);

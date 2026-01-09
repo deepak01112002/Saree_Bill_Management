@@ -1,6 +1,6 @@
-import { pdf } from '@react-pdf/renderer';
+import { pdf, Document } from '@react-pdf/renderer';
 import React from 'react';
-import { InvoicePDF } from './pdf-react';
+import { InvoicePDF, QuotationPDF, QuotationData } from './pdf-react';
 
 interface InvoiceData {
   billNumber: string;
@@ -80,8 +80,8 @@ export async function generatePDFFromElement(elementId: string, filename: string
     const invoiceData: InvoiceData = JSON.parse(invoiceDataJson);
 
     // Generate PDF using react-pdf
-    const doc = React.createElement(InvoicePDF, { data: invoiceData });
-    const asPdf = pdf(doc);
+    const doc = React.createElement(InvoicePDF, { data: invoiceData }) as React.ReactElement;
+    const asPdf = pdf(doc as any);
     const blob = await asPdf.toBlob();
     
     // Create download link
@@ -118,8 +118,8 @@ export async function generatePDFFromInvoiceData(data: InvoiceData, filename: st
     document.body.appendChild(loadingToast);
 
     // Generate PDF using react-pdf
-    const doc = React.createElement(InvoicePDF, { data });
-    const asPdf = pdf(doc);
+    const doc = React.createElement(InvoicePDF, { data }) as React.ReactElement;
+    const asPdf = pdf(doc as any);
     const blob = await asPdf.toBlob();
     
     // Create download link
@@ -138,6 +138,44 @@ export async function generatePDFFromInvoiceData(data: InvoiceData, filename: st
     }
   } catch (error) {
     console.error('Error generating PDF:', error);
+    throw error;
+  }
+}
+
+/**
+ * Generate Quotation PDF directly from quotation data
+ * @param data - Quotation data object
+ * @param filename - Name of the PDF file
+ */
+export async function generateQuotationPDF(data: QuotationData, filename: string = 'quotation'): Promise<void> {
+  try {
+    // Show loading indicator
+    const loadingToast = document.createElement('div');
+    loadingToast.textContent = 'Generating Quotation PDF...';
+    loadingToast.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #3b82f6; color: white; padding: 12px 24px; border-radius: 8px; z-index: 10000;';
+    document.body.appendChild(loadingToast);
+
+    // Generate PDF using react-pdf
+    const doc = React.createElement(QuotationPDF, { data }) as React.ReactElement;
+    const asPdf = pdf(doc as any);
+    const blob = await asPdf.toBlob();
+    
+    // Create download link
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${filename}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    // Remove loading indicator
+    if (document.body.contains(loadingToast)) {
+      document.body.removeChild(loadingToast);
+    }
+  } catch (error) {
+    console.error('Error generating quotation PDF:', error);
     throw error;
   }
 }

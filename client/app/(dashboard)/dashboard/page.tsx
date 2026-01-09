@@ -198,7 +198,7 @@ export default function DashboardPage() {
                       borderRadius: '8px',
                       padding: '8px 12px',
                     }}
-                    formatter={(value: number) => formatCurrency(value)}
+                    formatter={(value: number | undefined) => value ? formatCurrency(value) : '₹0'}
                     labelStyle={{ color: '#374151', fontWeight: '600' }}
                   />
                   <Legend />

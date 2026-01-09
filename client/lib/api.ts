@@ -34,9 +34,9 @@ const apiFetch = async (
   options: RequestInit = {}
 ): Promise<Response> => {
   const token = getAuthToken();
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...options.headers,
+    ...(options.headers as Record<string, string>),
   };
 
   if (token) {
@@ -695,6 +695,86 @@ export const fittingsAPI = {
 
   delete: async (id: string) => {
     const response = await apiFetch(`/fittings/${id}`, {
+      method: 'DELETE',
+    });
+    return response.json();
+  },
+};
+
+// Roll Polish API
+export const rollPolishAPI = {
+  getAll: async (params?: {
+    status?: string;
+    vendorName?: string;
+    startDate?: string;
+    endDate?: string;
+    search?: string;
+  }) => {
+    const query = new URLSearchParams();
+    if (params?.status) query.append('status', params.status);
+    if (params?.vendorName) query.append('vendorName', params.vendorName);
+    if (params?.startDate) query.append('startDate', params.startDate);
+    if (params?.endDate) query.append('endDate', params.endDate);
+    if (params?.search) query.append('search', params.search);
+
+    const queryString = query.toString();
+    const response = await apiFetch(`/roll-polish${queryString ? `?${queryString}` : ''}`);
+    return response.json();
+  },
+
+  getById: async (id: string) => {
+    const response = await apiFetch(`/roll-polish/${id}`);
+    return response.json();
+  },
+
+  create: async (data: {
+    rollNumber: string;
+    fabricType: string;
+    quantity: number;
+    unit?: string;
+    colorDesign?: string;
+    vendorName: string;
+    vendorContact?: string;
+    vendorAddress?: string;
+    status?: string;
+    sentDate: string;
+    expectedReturnDate?: string;
+    actualReturnDate?: string;
+    notes?: string;
+  }) => {
+    const response = await apiFetch('/roll-polish', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return response.json();
+  },
+
+  update: async (id: string, data: {
+    rollNumber?: string;
+    fabricType?: string;
+    quantity?: number;
+    unit?: string;
+    colorDesign?: string;
+    vendorName?: string;
+    vendorContact?: string;
+    vendorAddress?: string;
+    status?: string;
+    sentDate?: string;
+    expectedReturnDate?: string;
+    actualReturnDate?: string;
+    notes?: string;
+  }) => {
+    const response = await apiFetch(`/roll-polish/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return response.json();
+  },
+
+  delete: async (id: string) => {
+    const response = await apiFetch(`/roll-polish/${id}`, {
       method: 'DELETE',
     });
     return response.json();

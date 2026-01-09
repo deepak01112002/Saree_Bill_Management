@@ -6,11 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { productsAPI, billingAPI, customersAPI } from '@/lib/api';
+import { productsAPI, billingAPI, customersAPI, settingsAPI } from '@/lib/api';
 import { formatCurrency } from '@/lib/utils';
-import { Search, Plus, Minus, Trash2, ShoppingCart, User, QrCode } from 'lucide-react';
+import { Search, Plus, Minus, Trash2, ShoppingCart, User, QrCode, FileText } from 'lucide-react';
 import { QRScanner } from '@/components/billing/QRScanner';
 import { showToast } from '@/lib/toast';
+import { generateQuotationPDF } from '@/lib/pdf';
 
 interface CartItem {
   productId: string;
@@ -438,6 +439,115 @@ export default function BillingPage() {
       const errorMessage = error.message || error.error || 'Unknown error';
       setTimeout(() => {
         showToast.error('Failed to create bill: ' + errorMessage);
+      }, 0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDownloadQuotation = async () => {
+    if (cart.length === 0) {
+      setTimeout(() => {
+        showToast.error('Please add at least one item to the cart');
+      }, 0);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      // Fetch settings for company details
+      const settings = await settingsAPI.get();
+      
+      // Fetch full product details for each cart item to get SKU and HSN codes
+      const itemsWithDetails = await Promise.all(
+        cart.map(async (item) => {
+          try {
+            const product = await productsAPI.getById(item.productId);
+            return {
+              productName: item.productName,
+              productSku: product.sku || '',
+              quantity: item.quantity,
+              price: item.price,
+              total: item.total,
+              gstPercentage: item.gstPercentage || 0,
+              gstAmount: item.gstAmount || 0,
+              hsnCode: product.hsnCode || '',
+            };
+          } catch (error) {
+            // If product fetch fails, use cart item data without SKU/HSN
+            return {
+              productName: item.productName,
+              productSku: '',
+              quantity: item.quantity,
+              price: item.price,
+              total: item.total,
+              gstPercentage: item.gstPercentage || 0,
+              gstAmount: item.gstAmount || 0,
+              hsnCode: '',
+            };
+          }
+        })
+      );
+
+      // Prepare additional charges
+      const additionalChargesData = additionalCharges
+        .filter(charge => charge.serviceName.trim() && charge.rate > 0)
+        .map(charge => ({
+          serviceName: charge.serviceName,
+          quantity: charge.quantity,
+          unit: charge.unit,
+          rate: charge.rate,
+          amount: charge.quantity * charge.rate,
+        }));
+
+      const { subtotal, totalGstAmount, totalAdditionalCharges, discountAmount, grandTotal } = calculateTotals();
+
+      // Generate quotation number (QUOT-YYYYMMDD-HHMMSS)
+      const now = new Date();
+      const quotationNumber = `QUOT-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
+
+      // Prepare quotation data
+      const quotationData = {
+        quotationNumber,
+        createdAt: now.toISOString(),
+        companyName: settings.companyName,
+        website: settings.website,
+        gstin: settings.gstin,
+        pan: settings.pan,
+        cin: settings.cin,
+        registeredOfficeAddress: settings.registeredOfficeAddress,
+        placeOfSupply: settings.placeOfSupply,
+        paymentTerms: settings.paymentTerms,
+        customerName: customerName || undefined,
+        customerMobile: customerMobile || undefined,
+        customerPanCard: customerPanCard || undefined,
+        customerEmail: customerEmail || undefined,
+        customerAddress: undefined, // Not available in billing form
+        customerGstNumber: customerGstNumber || undefined,
+        customerFirmName: customerFirmName || undefined,
+        items: itemsWithDetails,
+        additionalCharges: additionalChargesData.length > 0 ? additionalChargesData : undefined,
+        subtotal,
+        gst: totalGstAmount,
+        discount: discountAmount,
+        discountPercentage: discount > 0 ? discount : undefined,
+        grandTotal,
+        quotationTermsAndConditions: settings.termsAndConditions,
+        quotationFooterNote: settings.invoiceFooterNote,
+      };
+
+      // Generate and download quotation PDF
+      await generateQuotationPDF(quotationData, quotationNumber);
+      
+      setTimeout(() => {
+        showToast.success('Quotation downloaded successfully!');
+      }, 0);
+    } catch (error: any) {
+      console.error('Error generating quotation:', error);
+      const errorMessage = error.message || error.error || 'Unknown error';
+      setTimeout(() => {
+        showToast.error('Failed to generate quotation: ' + errorMessage);
       }, 0);
     } finally {
       setLoading(false);
@@ -937,14 +1047,26 @@ export default function BillingPage() {
                 </div>
               </div>
 
-              <Button
-                onClick={handleGenerateBill}
-                disabled={loading || cart.length === 0}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                size="lg"
-              >
-                {loading ? 'Generating Bill...' : 'Generate Bill'}
-              </Button>
+              <div className="space-y-2">
+                <Button
+                  onClick={handleDownloadQuotation}
+                  disabled={loading || cart.length === 0}
+                  variant="outline"
+                  className="w-full border-2 border-blue-600 text-blue-600 hover:bg-blue-50"
+                  size="lg"
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  {loading ? 'Generating...' : 'Download Quotation'}
+                </Button>
+                <Button
+                  onClick={handleGenerateBill}
+                  disabled={loading || cart.length === 0}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  size="lg"
+                >
+                  {loading ? 'Generating Bill...' : 'Generate Bill'}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>

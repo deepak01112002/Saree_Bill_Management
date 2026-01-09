@@ -19,6 +19,7 @@ import {
   FileText,
   FolderOpen,
   Upload,
+  Sparkles,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -43,6 +44,7 @@ const allMenuItems: MenuItem[] = [
   { name: 'Sales', href: '/sales', icon: TrendingUp, roles: ['admin'] },
   { name: 'Returns', href: '/returns', icon: RotateCcw, roles: ['admin'] },
   { name: 'Fittings', href: '/fittings', icon: Package, roles: ['admin'] },
+  { name: 'Roll Polish', href: '/roll-polish', icon: Sparkles, roles: ['admin'] },
   { name: 'Wastage', href: '/wastage', icon: AlertTriangle, roles: ['admin'] },
   { name: 'Stock', href: '/stock', icon: BarChart3, roles: ['admin'] },
   { name: 'Stock Audit', href: '/stock-audit', icon: Package, roles: ['admin', 'staff'] },

@@ -339,7 +339,7 @@ export function InvoicePDF({ data }: { data: InvoiceData }) {
         </View>
 
         {/* Terms & Conditions - Always show */}
-        <View style={{ marginTop: 20, paddingTop: 15, borderTop: '1 solid #e5e7eb', minHeight: 50, break: false }}>
+        <View style={{ marginTop: 20, paddingTop: 15, borderTop: '1 solid #e5e7eb', minHeight: 50 }}>
           <Text style={[styles.sectionTitle, { marginBottom: 10, fontSize: 12, fontWeight: 'bold' }]}>Terms & Conditions:</Text>
           <View style={{ marginBottom: 10 }}>
             {data.invoiceTermsAndConditions && data.invoiceTermsAndConditions.trim() ? (
@@ -365,6 +365,265 @@ export function InvoicePDF({ data }: { data: InvoiceData }) {
             <Text style={{ fontSize: 9, marginTop: 5, marginBottom: 5 }}>{data.invoiceFooterNote}</Text>
           )}
           <Text style={{ fontSize: 9, marginTop: 5 }}>For returns, please bring this invoice within 7 days.</Text>
+        </View>
+      </Page>
+    </Document>
+  );
+}
+
+// Quotation Data Interface (similar to InvoiceData)
+export interface QuotationData {
+  quotationNumber: string;
+  createdAt: string;
+  companyName?: string;
+  website?: string;
+  gstin?: string;
+  pan?: string;
+  cin?: string;
+  registeredOfficeAddress?: string;
+  placeOfSupply?: string;
+  paymentTerms?: string;
+  customerName?: string;
+  customerMobile?: string;
+  customerPanCard?: string;
+  customerEmail?: string;
+  customerAddress?: string;
+  customerGstNumber?: string;
+  customerFirmName?: string;
+  items: Array<{
+    productName: string;
+    productSku?: string;
+    quantity: number;
+    price: number;
+    total: number;
+    gstPercentage?: number;
+    gstAmount?: number;
+    hsnCode?: string;
+  }>;
+  additionalCharges?: Array<{
+    serviceName: string;
+    quantity: number;
+    unit: string;
+    rate: number;
+    amount: number;
+  }>;
+  subtotal: number;
+  gst: number;
+  discount: number;
+  discountPercentage?: number;
+  grandTotal: number;
+  quotationTermsAndConditions?: string;
+  quotationFooterNote?: string;
+}
+
+// Quotation PDF Component
+export function QuotationPDF({ data }: { data: QuotationData }) {
+  const formatCurrency = (amount: number) => {
+    return `₹${amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
+  return (
+    <Document>
+      <Page size="A4" style={styles.page} wrap>
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.companyInfo}>
+            <View>
+              <Text style={styles.companyName}>{data.companyName || 'La Patola'}</Text>
+              <Text style={styles.website}>{data.website || 'www.lapatola.com'}</Text>
+            </View>
+            <View>
+              {data.gstin && <Text style={{ fontSize: 9 }}>GSTIN: {data.gstin}</Text>}
+              {data.pan && <Text style={{ fontSize: 9 }}>PAN: {data.pan}</Text>}
+              {data.cin && <Text style={{ fontSize: 9 }}>CIN: {data.cin}</Text>}
+              {data.registeredOfficeAddress && (
+                <Text style={{ fontSize: 8, marginTop: 5, maxWidth: 150 }}>
+                  {data.registeredOfficeAddress}
+                </Text>
+              )}
+            </View>
+          </View>
+
+          {/* Quotation Metadata */}
+          <View style={styles.invoiceMeta}>
+            <View>
+              <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#3b82f6', marginBottom: 5 }}>QUOTATION</Text>
+              <Text style={{ fontSize: 9 }}>Quotation Number: {data.quotationNumber}</Text>
+              <Text style={{ fontSize: 9 }}>Quotation Date: {formatDate(data.createdAt)}</Text>
+              <Text style={{ fontSize: 9 }}>Place of Supply: {data.placeOfSupply || 'N/A'}</Text>
+            </View>
+            <View>
+              <Text style={{ fontSize: 9 }}>Payment Terms: {data.paymentTerms || 'N/A'}</Text>
+              <Text style={{ fontSize: 9, fontStyle: 'italic', color: '#dc2626' }}>Valid for 30 days</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Customer Details */}
+        <View style={styles.customerSection}>
+          <View style={styles.customerBox}>
+            <Text style={styles.sectionTitle}>Quoted To:</Text>
+            {data.customerName ? (
+              <View>
+                <Text style={{ fontSize: 9 }}>{data.customerName}</Text>
+                {data.customerMobile && <Text style={{ fontSize: 9 }}>{data.customerMobile}</Text>}
+                {data.customerPanCard && <Text style={{ fontSize: 9 }}>PAN: {data.customerPanCard}</Text>}
+                {data.customerEmail && <Text style={{ fontSize: 9 }}>{data.customerEmail}</Text>}
+                {data.customerAddress && <Text style={{ fontSize: 9 }}>{data.customerAddress}</Text>}
+                {data.customerGstNumber && <Text style={{ fontSize: 9 }}>GST: {data.customerGstNumber}</Text>}
+                {data.customerFirmName && <Text style={{ fontSize: 9 }}>Firm: {data.customerFirmName}</Text>}
+              </View>
+            ) : (
+              <Text style={{ fontSize: 9 }}>Walk-in Customer</Text>
+            )}
+          </View>
+          <View style={styles.customerBox}>
+            <Text style={styles.sectionTitle}>Ship To:</Text>
+            {data.customerName ? (
+              <View>
+                <Text style={{ fontSize: 9 }}>{data.customerName}</Text>
+                {data.customerMobile && <Text style={{ fontSize: 9 }}>{data.customerMobile}</Text>}
+                {data.customerAddress ? (
+                  <Text style={{ fontSize: 9 }}>{data.customerAddress}</Text>
+                ) : (
+                  <Text style={{ fontSize: 9, fontStyle: 'italic' }}>Same as billing address</Text>
+                )}
+              </View>
+            ) : (
+              <Text style={{ fontSize: 9 }}>Walk-in Customer</Text>
+            )}
+          </View>
+        </View>
+
+        {/* Items Table */}
+        <View style={styles.table}>
+          <View style={styles.tableHeader}>
+            <Text style={[styles.tableCell, styles.col1, { fontWeight: 'bold' }]}>Item Description</Text>
+            <Text style={[styles.tableCell, styles.col2, { fontWeight: 'bold', textAlign: 'center' }]}>HSN Code</Text>
+            <Text style={[styles.tableCell, styles.col3, { fontWeight: 'bold', textAlign: 'center' }]}>Qty</Text>
+            <Text style={[styles.tableCell, styles.col4, { fontWeight: 'bold', textAlign: 'right' }]}>Rate</Text>
+            <Text style={[styles.tableCell, styles.col5, { fontWeight: 'bold', textAlign: 'right' }]}>GST</Text>
+            <Text style={[styles.tableCell, styles.col6, { fontWeight: 'bold', textAlign: 'right' }]}>Amount</Text>
+          </View>
+          {data.items.map((item, index) => (
+            <View key={index} style={styles.tableRow}>
+              <View style={styles.col1}>
+                <Text style={styles.tableCell}>{item.productName}</Text>
+                {item.productSku && <Text style={[styles.tableCell, { fontSize: 8, color: '#6b7280' }]}>SKU: {item.productSku}</Text>}
+                {item.gstPercentage && item.gstPercentage > 0 && (
+                  <Text style={[styles.tableCell, { fontSize: 8, color: '#3b82f6' }]}>
+                    GST ({item.gstPercentage}%): {formatCurrency(item.gstAmount || 0)}
+                  </Text>
+                )}
+              </View>
+              <Text style={[styles.tableCell, styles.col2, { textAlign: 'center' }]}>{item.hsnCode || 'N/A'}</Text>
+              <Text style={[styles.tableCell, styles.col3, { textAlign: 'center' }]}>{item.quantity}</Text>
+              <Text style={[styles.tableCell, styles.col4, { textAlign: 'right' }]}>{formatCurrency(item.price)}</Text>
+              <Text style={[styles.tableCell, styles.col5, { textAlign: 'right' }]}>
+                {item.gstAmount ? formatCurrency(item.gstAmount) : '-'}
+              </Text>
+              <Text style={[styles.tableCell, styles.col6, { textAlign: 'right' }]}>{formatCurrency(item.total)}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Additional Charges */}
+        {data.additionalCharges && data.additionalCharges.length > 0 && (
+          <View style={{ marginBottom: 15 }}>
+            <Text style={[styles.sectionTitle, { marginBottom: 10 }]}>Additional Services:</Text>
+            {data.additionalCharges.map((charge, index) => (
+              <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 }}>
+                <Text style={{ fontSize: 9 }}>
+                  {charge.serviceName} ({charge.quantity} {charge.unit})
+                </Text>
+                <Text style={{ fontSize: 9, fontWeight: 'bold' }}>{formatCurrency(charge.amount)}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Summary */}
+        <View style={styles.summary}>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Subtotal:</Text>
+            <Text style={styles.summaryValue}>{formatCurrency(data.subtotal)}</Text>
+          </View>
+          {data.additionalCharges && data.additionalCharges.length > 0 && (
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Additional Services:</Text>
+              <Text style={styles.summaryValue}>
+                {formatCurrency(data.additionalCharges.reduce((sum, c) => sum + c.amount, 0))}
+              </Text>
+            </View>
+          )}
+          {data.gst > 0 && (
+            <>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>CGST:</Text>
+                <Text style={styles.summaryValue}>{formatCurrency(data.gst / 2)}</Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>SGST:</Text>
+                <Text style={styles.summaryValue}>{formatCurrency(data.gst / 2)}</Text>
+              </View>
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>Total GST:</Text>
+                <Text style={styles.summaryValue}>{formatCurrency(data.gst)}</Text>
+              </View>
+            </>
+          )}
+          {data.discount > 0 && (
+            <View style={styles.summaryRow}>
+              <Text style={[styles.summaryLabel, { color: '#dc2626' }]}>
+                Discount{data.discountPercentage ? ` (${data.discountPercentage}%)` : ''}:
+              </Text>
+              <Text style={[styles.summaryValue, { color: '#dc2626' }]}>-{formatCurrency(data.discount)}</Text>
+            </View>
+          )}
+          <View style={[styles.summaryRow, styles.grandTotal]}>
+            <Text style={styles.summaryLabel}>Grand Total:</Text>
+            <Text style={styles.summaryValue}>{formatCurrency(data.grandTotal)}</Text>
+          </View>
+        </View>
+
+        {/* Terms & Conditions - Always show */}
+        <View style={{ marginTop: 20, paddingTop: 15, borderTop: '1 solid #e5e7eb', minHeight: 50 }}>
+          <Text style={[styles.sectionTitle, { marginBottom: 10, fontSize: 12, fontWeight: 'bold' }]}>Terms & Conditions:</Text>
+          <View style={{ marginBottom: 10 }}>
+            {data.quotationTermsAndConditions && data.quotationTermsAndConditions.trim() ? (
+              data.quotationTermsAndConditions.split('\n').filter(line => line.trim()).map((line, index) => (
+                <Text key={index} style={{ fontSize: 9, lineHeight: 1.5, marginBottom: 3 }}>
+                  {line.trim()}
+                </Text>
+              ))
+            ) : (
+              <>
+                <Text style={{ fontSize: 9, lineHeight: 1.5, marginBottom: 3 }}>• This quotation is valid for 30 days from the date of issue.</Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.5, marginBottom: 3 }}>• Prices are subject to change without prior notice.</Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.5, marginBottom: 3 }}>• Payment terms as mentioned above.</Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.5 }}>• This is a system-generated quotation.</Text>
+              </>
+            )}
+          </View>
+        </View>
+
+        {/* Footer */}
+        <View style={styles.footer}>
+          <Text style={{ marginBottom: 10, fontWeight: 'bold', fontSize: 12 }}>Thank you for your interest!</Text>
+          <Text style={{ fontSize: 10, color: '#3b82f6', marginBottom: 10 }}>{data.website || 'www.lapatola.com'}</Text>
+          {data.quotationFooterNote && (
+            <Text style={{ fontSize: 9, marginTop: 5, marginBottom: 5 }}>{data.quotationFooterNote}</Text>
+          )}
+          <Text style={{ fontSize: 9, marginTop: 5 }}>For any queries, please contact us.</Text>
         </View>
       </Page>
     </Document>

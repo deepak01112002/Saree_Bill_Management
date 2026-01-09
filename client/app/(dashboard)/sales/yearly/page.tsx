@@ -158,7 +158,7 @@ export default function YearlySalesPage() {
                     <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
                     <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
                     <Tooltip
-                      formatter={(value: any, name: string) => {
+                      formatter={(value: any, name?: string) => {
                         if (name === 'revenue') {
                           return [formatCurrency(value), 'Revenue'];
                         }

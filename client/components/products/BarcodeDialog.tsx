@@ -10,8 +10,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import { generateBarcodeDataURL } from '@/lib/barcode';
 import { showToast } from '@/lib/toast';
+import { printBarcodes, BarcodePrintProduct, PrintOptions, PrintFormat } from '@/lib/barcode-print';
 import { ScanLine, Download, Printer } from 'lucide-react';
 
 interface BarcodeDialogProps {
@@ -28,6 +30,9 @@ interface BarcodeDialogProps {
 export function BarcodeDialog({ open, onOpenChange, product }: BarcodeDialogProps) {
   const [barcodeDataURL, setBarcodeDataURL] = useState<string>('');
   const [loading, setLoading] = useState(false);
+  const [printing, setPrinting] = useState(false);
+  const [printFormat, setPrintFormat] = useState<PrintFormat>('normal');
+  const [paperWidth, setPaperWidth] = useState<'58mm' | '80mm'>('58mm');
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -67,60 +72,33 @@ export function BarcodeDialog({ open, onOpenChange, product }: BarcodeDialogProp
     link.click();
   };
 
-  const handlePrint = () => {
-    if (!barcodeDataURL || !product) return;
+  const handlePrint = async () => {
+    if (!product) return;
 
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>Barcode - ${product.name}</title>
-            <style>
-              body {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                padding: 40px;
-                font-family: Arial, sans-serif;
-              }
-              .product-info {
-                text-align: center;
-                margin-bottom: 20px;
-              }
-              .product-name {
-                font-size: 18px;
-                font-weight: bold;
-                margin-bottom: 5px;
-              }
-              .product-sku {
-                font-size: 14px;
-                color: #666;
-                margin-bottom: 10px;
-              }
-              .product-price {
-                font-size: 16px;
-                color: #333;
-              }
-              img {
-                max-width: 400px;
-                height: auto;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="product-info">
-              <div class="product-name">${product.name}</div>
-              <div class="product-sku">SKU: ${product.sku}</div>
-              <div class="product-price">₹${product.sellingPrice}</div>
-            </div>
-            <img src="${barcodeDataURL}" alt="Barcode" />
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.print();
+    try {
+      setPrinting(true);
+      const productToPrint: BarcodePrintProduct = {
+        _id: product._id,
+        name: product.name,
+        sku: product.sku,
+        sellingPrice: product.sellingPrice,
+        mrp: product.sellingPrice,
+      };
+
+      const options: PrintOptions = {
+        format: printFormat,
+        paperWidth: printFormat === 'thermal' ? paperWidth : undefined,
+        columns: printFormat === 'normal' ? 4 : undefined,
+        labelsPerPage: printFormat === 'normal' ? 24 : undefined,
+      };
+
+      await printBarcodes([productToPrint], options);
+      showToast.success('Opening print dialog...');
+    } catch (error: any) {
+      console.error('Error printing barcode:', error);
+      showToast.error('Failed to print: ' + (error.message || 'Unknown error'));
+    } finally {
+      setPrinting(false);
     }
   };
 
@@ -158,16 +136,61 @@ export function BarcodeDialog({ open, onOpenChange, product }: BarcodeDialogProp
           )}
         </div>
 
-        <DialogFooter className="flex gap-2">
-          <Button variant="outline" onClick={handleDownload} disabled={!barcodeDataURL}>
-            <Download className="mr-2 h-4 w-4" />
-            Download
-          </Button>
-          <Button onClick={handlePrint} disabled={!barcodeDataURL}>
-            <Printer className="mr-2 h-4 w-4" />
-            Print
-          </Button>
-        </DialogFooter>
+        <div className="space-y-4">
+          {/* Print Format Selection */}
+          <div className="border-t pt-4 space-y-3">
+            <Label className="text-sm font-semibold">Print Format</Label>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="dialog-format"
+                  value="normal"
+                  checked={printFormat === 'normal'}
+                  onChange={(e) => setPrintFormat(e.target.value as PrintFormat)}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm">Normal Printer</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="dialog-format"
+                  value="thermal"
+                  checked={printFormat === 'thermal'}
+                  onChange={(e) => setPrintFormat(e.target.value as PrintFormat)}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm">Thermal Printer</span>
+              </label>
+            </div>
+
+            {printFormat === 'thermal' && (
+              <div className="space-y-2">
+                <Label className="text-xs">Paper Width</Label>
+                <select
+                  className="w-full h-9 px-3 border border-gray-300 rounded-md text-sm"
+                  value={paperWidth}
+                  onChange={(e) => setPaperWidth(e.target.value as '58mm' | '80mm')}
+                >
+                  <option value="58mm">58mm (2 columns)</option>
+                  <option value="80mm">80mm (3 columns)</option>
+                </select>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="flex gap-2">
+            <Button variant="outline" onClick={handleDownload} disabled={!barcodeDataURL}>
+              <Download className="mr-2 h-4 w-4" />
+              Download
+            </Button>
+            <Button onClick={handlePrint} disabled={printing || !barcodeDataURL}>
+              <Printer className="mr-2 h-4 w-4" />
+              {printing ? 'Preparing...' : 'Print'}
+            </Button>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

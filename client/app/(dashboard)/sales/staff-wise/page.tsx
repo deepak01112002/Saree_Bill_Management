@@ -267,7 +267,7 @@ export default function StaffWiseSalesPage() {
                               <div className="w-24 bg-gray-200 rounded-full h-2">
                                 <div
                                   className="bg-blue-600 h-2 rounded-full"
-                                  style={{ width: `${Math.min(performancePercent, 100)}%` }}
+                                  style={{ width: `${Math.min(Number(performancePercent) || 0, 100)}%` }}
                                 ></div>
                               </div>
                               <span className="text-sm font-medium text-gray-700 w-12 text-right">

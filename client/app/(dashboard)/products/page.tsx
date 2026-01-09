@@ -241,7 +241,9 @@ export default function ProductsPage() {
                               {formatCurrency(product.sellingPrice)}
                             </span>
                             {product.priceLocked && (
-                              <Lock className="h-4 w-4 text-yellow-600" title="Price Locked" />
+                              <span title="Price Locked">
+                                <Lock className="h-4 w-4 text-yellow-600" />
+                              </span>
                             )}
                           </div>
                         </td>
