@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Package, ShoppingCart, TrendingUp, AlertTriangle } from 'lucide-react';
 import { dashboardAPI } from '@/lib/api';
@@ -42,10 +42,15 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [isUserAdmin, setIsUserAdmin] = useState<boolean>(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Set mounted flag to true after component mounts (client-side only)
+    setMounted(true);
     const currentUser = getCurrentUser();
     setUser(currentUser);
+    setIsUserAdmin(isAdmin());
     loadDashboardStats();
   }, []);
 
@@ -61,52 +66,59 @@ export default function DashboardPage() {
       setLoading(false);
     }
   };
-
-  const isUserAdmin = isAdmin();
   
-  const statsCards = stats ? [
-    ...(isUserAdmin ? [{
-      title: 'Total Products',
-      value: stats.totalProducts.toLocaleString(),
-      change: '',
-      icon: Package,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-100',
-    }] : []),
-    {
-      title: isUserAdmin ? "Today's Sales" : "My Today's Sales",
-      value: formatCurrency(stats.todaySales),
-      change: `${stats.todayBillCount} bills`,
-      icon: ShoppingCart,
-      color: 'text-green-600',
-      bgColor: 'bg-green-100',
-    },
-    {
-      title: isUserAdmin ? 'Monthly Revenue' : 'My Monthly Revenue',
-      value: formatCurrency(stats.monthlyRevenue),
-      change: `${stats.monthlyRevenueChange}%`,
-      icon: TrendingUp,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-100',
-    },
-    ...(isUserAdmin ? [{
-      title: 'Low Stock Items',
-      value: stats.lowStockCount.toString(),
-      change: `${stats.outOfStockCount} out of stock`,
-      icon: AlertTriangle,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-100',
-    }] : []),
-  ] : [];
+  // Use useMemo to prevent hydration mismatch - only calculate after mount
+  const statsCards = useMemo(() => {
+    if (!stats || !mounted) return [];
+    
+    return [
+      ...(isUserAdmin ? [{
+        title: 'Total Products',
+        value: stats.totalProducts.toLocaleString(),
+        change: '',
+        icon: Package,
+        color: 'text-blue-600',
+        bgColor: 'bg-blue-100',
+      }] : []),
+      {
+        title: isUserAdmin ? "Today's Sales" : "My Today's Sales",
+        value: formatCurrency(stats.todaySales),
+        change: `${stats.todayBillCount} bills`,
+        icon: ShoppingCart,
+        color: 'text-green-600',
+        bgColor: 'bg-green-100',
+      },
+      {
+        title: isUserAdmin ? 'Monthly Revenue' : 'My Monthly Revenue',
+        value: formatCurrency(stats.monthlyRevenue),
+        change: `${stats.monthlyRevenueChange}%`,
+        icon: TrendingUp,
+        color: 'text-purple-600',
+        bgColor: 'bg-purple-100',
+      },
+      ...(isUserAdmin ? [{
+        title: 'Low Stock Items',
+        value: stats.lowStockCount.toString(),
+        change: `${stats.outOfStockCount} out of stock`,
+        icon: AlertTriangle,
+        color: 'text-orange-600',
+        bgColor: 'bg-orange-100',
+      }] : []),
+    ];
+  }, [stats, isUserAdmin, mounted]);
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-gray-600 mt-1">
-          {isUserAdmin 
-            ? "Welcome back! Here's what's happening today." 
-            : `Welcome back, ${user?.name || 'Staff'}! Here's your performance today.`}
+          {!mounted ? (
+            "Welcome back! Here's what's happening today."
+          ) : isUserAdmin ? (
+            "Welcome back! Here's what's happening today."
+          ) : (
+            `Welcome back, ${user?.name || 'Staff'}! Here's your performance today.`
+          )}
         </p>
       </div>
 
