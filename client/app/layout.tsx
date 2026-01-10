@@ -27,21 +27,21 @@ const getBaseUrl = () => {
 export const metadata: Metadata = {
   title: "Saree Retail Management System",
   description: "Modern billing and inventory management for saree retail outlets",
+  // Next.js App Router automatically uses app/icon.png for favicon
+  // and app/opengraph-image.png for OG images, so no explicit icons needed
   icons: {
-    icon: [
-      { url: '/icon.jpg', sizes: 'any' },
-      { url: '/favicon.ico', sizes: 'any' },
-    ],
-    apple: '/icon.jpg',
+    icon: '/icon.png',
+    apple: '/icon.png',
   },
   openGraph: {
-    title: "Saree Retail Management System",
-    description: "Modern billing and inventory management for saree retail outlets",
+    title: "La Patola - Saree Retail Management System",
+    description: "Modern billing and inventory management for saree retail outlets - The Art of Royal Weaves",
     type: "website",
-    siteName: "Saree Retail Management System",
+    siteName: "La Patola",
+    // Next.js automatically uses app/opengraph-image.png, but we can reference it explicitly
     images: [
       {
-        url: `${getBaseUrl()}/logo.jpg`,
+        url: `${getBaseUrl()}/opengraph-image.png`,
         width: 1280,
         height: 1280,
         alt: 'La Patola - The Art of Royal Weaves',
@@ -50,9 +50,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Saree Retail Management System",
-    description: "Modern billing and inventory management for saree retail outlets",
-    images: [`${getBaseUrl()}/logo.jpg`],
+    title: "La Patola - Saree Retail Management System",
+    description: "Modern billing and inventory management for saree retail outlets - The Art of Royal Weaves",
+    images: [`${getBaseUrl()}/opengraph-image.png`],
   },
   metadataBase: new URL(getBaseUrl()),
 };
