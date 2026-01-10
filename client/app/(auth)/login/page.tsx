@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,33 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [companyName, setCompanyName] = useState('Saree Retail Management');
+
+  // Fetch company name from settings on mount (public endpoint)
+  useEffect(() => {
+    const loadCompanyName = async () => {
+      try {
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+        const response = await fetch(`${API_BASE_URL}/settings`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (response.ok) {
+          const settings = await response.json();
+          if (settings?.companyName) {
+            setCompanyName(settings.companyName + ' Management');
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load company name:', error);
+        // Keep default name if fetch fails
+      }
+    };
+    loadCompanyName();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,10 +106,10 @@ export default function LoginPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl mb-4 shadow-lg">
             <ShoppingBag className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Saree Retail Management
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            {companyName}
           </h1>
-          <p className="text-gray-600">Sign in to your account</p>
+          <p className="text-gray-600 dark:text-gray-400">Sign in to your account</p>
         </div>
 
         <Card className="shadow-xl border-0">

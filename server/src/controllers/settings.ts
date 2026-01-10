@@ -1,10 +1,10 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import connectDB from '../config/database';
 import Settings from '../models/Settings';
 
-// Get settings (only one settings document exists)
-export const getSettings = async (req: AuthRequest, res: Response) => {
+// Get settings (only one settings document exists) - Public endpoint
+export const getSettings = async (req: Request | AuthRequest, res: Response) => {
   try {
     await connectDB();
     
