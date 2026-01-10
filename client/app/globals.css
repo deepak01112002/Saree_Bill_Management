@@ -81,3 +81,13 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--foreground));
 }
+
+/* Hide scrollbar for sidebar but keep functionality */
+.sidebar-scroll::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.sidebar-scroll {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}

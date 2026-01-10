@@ -47,7 +47,6 @@ const allMenuItems: MenuItem[] = [
   { name: 'Roll Polish', href: '/roll-polish', icon: Sparkles, roles: ['admin'] },
   { name: 'Wastage', href: '/wastage', icon: AlertTriangle, roles: ['admin'] },
   { name: 'Stock', href: '/stock', icon: BarChart3, roles: ['admin'] },
-  { name: 'Stock Audit', href: '/stock-audit', icon: Package, roles: ['admin', 'staff'] },
   { name: 'Users', href: '/users', icon: UserCog, roles: ['admin'] },
   { name: 'Reports', href: '/reports', icon: BarChart3, roles: ['admin'] },
   { name: 'Settings', href: '/settings', icon: Settings, roles: ['admin'] },
@@ -122,61 +121,87 @@ export function Sidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed left-0 top-0 z-40 h-screen w-64 bg-gradient-to-b from-blue-600 to-purple-700 text-white transition-transform duration-300 lg:translate-x-0',
+          'fixed left-0 top-0 z-40 h-screen w-64 bg-gradient-to-br from-blue-600 via-blue-700 to-purple-800 text-white transition-transform duration-300 shadow-2xl lg:translate-x-0',
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        <div className="flex h-full flex-col">
+        <div className="flex h-full flex-col relative">
+          {/* Decorative background pattern */}
+          <div className="absolute inset-0 opacity-10 pointer-events-none">
+            <div className="absolute inset-0" style={{
+              backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.3) 1px, transparent 0)`,
+              backgroundSize: '24px 24px'
+            }}></div>
+          </div>
+
           {/* Logo */}
-          <div className="flex h-16 items-center justify-between px-6 border-b border-white/20">
+          <div className="relative flex h-20 items-center justify-between px-6 border-b border-white/20 backdrop-blur-sm">
             <div className="flex items-center space-x-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/20">
-                <ShoppingCart className="h-6 w-6" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/20 backdrop-blur-md shadow-lg ring-2 ring-white/30">
+                <ShoppingCart className="h-6 w-6 text-white" />
               </div>
-              <div>
-                <h2 className="text-lg font-bold">{companyName}</h2>
-                <p className="text-xs text-white/80">{systemName}</p>
+              <div className="flex flex-col">
+                <h2 className="text-lg font-bold text-white drop-shadow-md">{companyName}</h2>
+                <p className="text-xs text-white/90 font-medium">{systemName}</p>
               </div>
             </div>
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setMobileMenuOpen(false)}
-              className="lg:hidden text-white hover:bg-white/20"
+              className="lg:hidden text-white hover:bg-white/20 rounded-lg transition-all"
             >
               <X className="h-5 w-5" />
             </Button>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={cn(
-                    'flex items-center space-x-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors',
-                    isActive
-                      ? 'bg-white/20 text-white shadow-lg'
-                      : 'text-white/80 hover:bg-white/10 hover:text-white'
-                  )}
-                >
-                  <Icon className="h-5 w-5" />
-                  <span>{item.name}</span>
-                </Link>
-              );
-            })}
+          <nav className="relative flex-1 overflow-y-auto overflow-x-hidden px-3 py-4 sidebar-scroll">
+            <div className="space-y-1">
+              {menuItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={cn(
+                      'group flex items-center space-x-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 relative overflow-hidden',
+                      isActive
+                        ? 'bg-white/25 text-white shadow-lg backdrop-blur-md ring-2 ring-white/30 scale-[1.02]'
+                        : 'text-white/90 hover:bg-white/15 hover:text-white hover:shadow-md hover:scale-[1.01]'
+                    )}
+                  >
+                    {/* Active indicator line */}
+                    {isActive && (
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-white rounded-r-full"></div>
+                    )}
+                    {/* Hover effect background */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                    <Icon className={cn(
+                      'relative h-5 w-5 transition-transform duration-200',
+                      isActive ? 'scale-110' : 'group-hover:scale-110'
+                    )} />
+                    <span className="relative font-semibold">{item.name}</span>
+                    {/* Active arrow indicator */}
+                    {isActive && (
+                      <div className="relative ml-auto">
+                        <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
+                      </div>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
           </nav>
 
           {/* Footer */}
-          <div className="border-t border-white/20 p-4">
-            <p className="text-xs text-white/60 text-center">
-              © 2024 {companyName} {systemName}
+          <div className="relative border-t border-white/20 p-4 backdrop-blur-sm">
+            <p className="text-xs text-white/70 text-center font-medium">
+              © 2024 <span className="font-semibold">{companyName}</span>
             </p>
+            <p className="text-xs text-white/60 text-center mt-1">{systemName}</p>
           </div>
         </div>
       </aside>

@@ -579,8 +579,8 @@ export default function BillingPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Billing Counter</h1>
-        <p className="text-gray-600 mt-1">Create a new bill</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Billing Counter</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">Create a new bill</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -1032,17 +1032,27 @@ export default function BillingPage() {
 
               <div className="space-y-2 pt-4 border-t">
                 <Label>Payment Mode</Label>
-                <div className="flex gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   {(['cash', 'upi', 'card'] as const).map((mode) => (
-                    <Button
+                    <button
                       key={mode}
                       type="button"
-                      variant={paymentMode === mode ? 'default' : 'outline'}
                       onClick={() => setPaymentMode(mode)}
-                      className="flex-1 capitalize"
+                      className={`
+                        flex-1 capitalize px-4 py-3 rounded-md font-medium text-sm transition-all duration-200
+                        border-2 flex items-center justify-center
+                        ${
+                          paymentMode === mode
+                            ? 'bg-blue-600 border-blue-600 text-white shadow-md ring-2 ring-blue-300 ring-offset-2'
+                            : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700'
+                        }
+                      `}
                     >
-                      {mode}
-                    </Button>
+                      <span className="font-semibold">{mode.toUpperCase()}</span>
+                      {paymentMode === mode && (
+                        <span className="ml-2 text-xs">✓</span>
+                      )}
+                    </button>
                   ))}
                 </div>
               </div>
@@ -1052,7 +1062,7 @@ export default function BillingPage() {
                   onClick={handleDownloadQuotation}
                   disabled={loading || cart.length === 0}
                   variant="outline"
-                  className="w-full border-2 border-blue-600 text-blue-600 hover:bg-blue-50"
+                  className="w-full border-2 border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900"
                   size="lg"
                 >
                   <FileText className="mr-2 h-4 w-4" />
@@ -1061,7 +1071,7 @@ export default function BillingPage() {
                 <Button
                   onClick={handleGenerateBill}
                   disabled={loading || cart.length === 0}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                   size="lg"
                 >
                   {loading ? 'Generating Bill...' : 'Generate Bill'}

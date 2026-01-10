@@ -342,17 +342,27 @@ export default function CreateReturnPage() {
 
               <div className="space-y-2 pt-4 border-t">
                 <Label>Refund Mode</Label>
-                <div className="flex flex-col gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   {(['cash', 'upi', 'card', 'adjustment'] as const).map((mode) => (
-                    <Button
+                    <button
                       key={mode}
                       type="button"
-                      variant={refundMode === mode ? 'default' : 'outline'}
                       onClick={() => setRefundMode(mode)}
-                      className="w-full capitalize"
+                      className={`
+                        capitalize px-4 py-3 rounded-md font-medium text-sm transition-all duration-200
+                        border-2 flex items-center justify-center
+                        ${
+                          refundMode === mode
+                            ? 'bg-blue-600 border-blue-600 text-white shadow-md ring-2 ring-blue-300 ring-offset-2'
+                            : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700'
+                        }
+                      `}
                     >
-                      {mode}
-                    </Button>
+                      <span className="font-semibold">{mode.toUpperCase()}</span>
+                      {refundMode === mode && (
+                        <span className="ml-2 text-xs">✓</span>
+                      )}
+                    </button>
                   ))}
                 </div>
               </div>
