@@ -57,8 +57,9 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
   try {
     await connectDB();
     
-    // Generate SKU in LP-CAT01-000123 format if category is provided
-    let sku = req.body.sku;
+    // Generate SKU in LP-CAT01-000123 format if category is provided and SKU is empty/undefined
+    let sku = req.body.sku?.trim() || '';
+    
     if (!sku && req.body.category) {
       const Category = (await import('../models/Category')).default;
       const category = await Category.findById(req.body.category);
@@ -84,9 +85,16 @@ export const createProduct = async (req: AuthRequest, res: Response) => {
       }
     }
     
+    // Validate SKU is provided or generated
+    if (!sku) {
+      return res.status(400).json({ 
+        error: 'SKU is required. Please provide a SKU or select a category for auto-generation.' 
+      });
+    }
+    
     const product = await Product.create({
       ...req.body,
-      sku: sku || req.body.sku,
+      sku: sku.toUpperCase(),
     });
     
     // Populate category before returning

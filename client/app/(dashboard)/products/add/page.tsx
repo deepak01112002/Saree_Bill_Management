@@ -110,31 +110,46 @@ export default function AddProductPage() {
       setError('');
 
       // Generate SKU if auto-generate is enabled and SKU is empty
-      let finalSku = data.sku;
-      if (autoGenerateSKU && !finalSku) {
-        finalSku = generateSKU();
-        // If still empty, get from watch
-        if (!finalSku) {
-          finalSku = watch('sku');
+      let finalSku: string | undefined = data.sku?.trim();
+      
+      // If category is selected, backend will auto-generate SKU - so allow empty SKU
+      if (data.category) {
+        // Backend will generate SKU in LP-CAT01-000123 format, so we can send empty or undefined
+        finalSku = undefined;
+      } else if (autoGenerateSKU && !finalSku) {
+        // Only generate SKU if no category and auto-generate is enabled
+        if (name && brand) {
+          finalSku = generateSKU();
+          // If still empty, get from watch
+          if (!finalSku) {
+            finalSku = watch('sku')?.trim();
+          }
         }
       }
 
-      if (!finalSku) {
+      // Only validate SKU if category is not selected
+      if (!data.category && !finalSku) {
         setError('SKU is required. Please enter a SKU or ensure name and brand are filled for auto-generation.');
         setLoading(false);
         return;
       }
 
-      // Update data with final SKU
-      data.sku = finalSku;
-
-      const productData = {
+      // Prepare product data - exclude SKU if category is selected (backend will generate it)
+      const productData: any = {
         ...data,
         costPrice: Number(data.costPrice),
         sellingPrice: Number(data.sellingPrice),
         stockQuantity: Number(data.stockQuantity),
         purchaseDate: new Date(data.purchaseDate),
       };
+
+      // Only include SKU if it's provided (not when category is selected)
+      if (finalSku) {
+        productData.sku = finalSku;
+      } else {
+        // Don't include SKU in request - backend will generate it
+        delete productData.sku;
+      }
 
       await productsAPI.create(productData);
       router.push('/products');
@@ -284,16 +299,21 @@ export default function AddProductPage() {
                 <Input
                   id="sku"
                   {...register('sku', { 
-                    required: autoGenerateSKU && !category ? false : (!category ? 'SKU is required' : false),
+                    required: category ? false : (!autoGenerateSKU ? 'SKU is required when auto-generate is disabled' : false),
                     validate: (value) => {
-                      if (!autoGenerateSKU && !category && !value) {
-                        return 'SKU is required';
+                      // If category is selected, SKU is optional (backend generates it)
+                      if (category) {
+                        return true;
+                      }
+                      // If no category and auto-generate is disabled, SKU is required
+                      if (!autoGenerateSKU && !value) {
+                        return 'SKU is required when auto-generate is disabled';
                       }
                       return true;
                     }
                   })}
                   placeholder={category ? "Will be auto-generated as LP-CAT01-000123" : "e.g., SIL-BRA-1234 or LP-CAT01-000123"}
-                  disabled={autoGenerateSKU || !!category}
+                  disabled={!!category || (autoGenerateSKU && !category)}
                   className="font-mono"
                 />
                 {category && (
