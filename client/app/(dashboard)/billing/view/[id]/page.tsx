@@ -577,7 +577,7 @@ export default function BillViewPage() {
                             )}
                           </td>
                           <td className="p-3 text-center text-gray-700 font-mono text-sm">
-                            {item.hsnCode || '[HSN Code]'}
+                            {item.hsnCode || '-'}
                           </td>
                           <td className="p-3 text-center">
                             {item.productSku && billQRCode && (

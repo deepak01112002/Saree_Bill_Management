@@ -23,6 +23,7 @@ interface Product {
   stockQuantity: number;
   sku: string;
   gstPercentage?: number;
+  hsnCode?: string;
   priceLocked?: boolean;
   category?: {
     _id: string;
@@ -206,6 +207,7 @@ export default function ProductsPage() {
                       <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Type</th>
                       <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Brand</th>
                       <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">SKU</th>
+                      <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">HSN</th>
                       <th className="text-right p-4 font-semibold text-gray-700 dark:text-gray-300">Price</th>
                       <th className="text-right p-4 font-semibold text-gray-700 dark:text-gray-300">GST %</th>
                       <th className="text-right p-4 font-semibold text-gray-700 dark:text-gray-300">Stock</th>
@@ -233,6 +235,11 @@ export default function ProductsPage() {
                         <td className="p-4">
                           <span className="font-mono text-sm bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white px-2 py-1 rounded">
                             {product.sku}
+                          </span>
+                        </td>
+                        <td className="p-4">
+                          <span className="font-mono text-sm text-gray-700 dark:text-gray-300">
+                            {product.hsnCode || '-'}
                           </span>
                         </td>
                         <td className="p-4 text-right">

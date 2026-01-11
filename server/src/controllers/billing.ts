@@ -64,6 +64,7 @@ export const createBill = async (req: AuthRequest, res: Response) => {
         productId: product._id.toString(),
         productName: product.name,
         productSku: product.sku,
+        hsnCode: product.hsnCode,
         categoryId: categoryId,
         categoryName: categoryName,
         gstPercentage: itemGstPercentage,

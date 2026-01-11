@@ -4,6 +4,7 @@ export interface IBillItem {
   productId: string;
   productName: string;
   productSku?: string;
+  hsnCode?: string; // HSN Code from product
   categoryId?: string;
   categoryName?: string;
   gstPercentage?: number; // GST percentage for this item
@@ -87,6 +88,11 @@ const BillItemSchema = new Schema<IBillItem>(
     productSku: {
       type: String,
       trim: true,
+    },
+    hsnCode: {
+      type: String,
+      trim: true,
+      uppercase: true,
     },
     categoryId: {
       type: String,
