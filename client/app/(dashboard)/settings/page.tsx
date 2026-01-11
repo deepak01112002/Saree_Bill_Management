@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { settingsAPI } from '@/lib/api';
 import { showToast } from '@/lib/toast';
@@ -111,7 +112,7 @@ export default function SettingsPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Loading settings...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading settings...</p>
         </div>
       </div>
     );
@@ -120,14 +121,14 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">System Settings</h1>
-        <p className="text-gray-600 mt-1">Configure company information and system preferences</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">System Settings</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">Configure company information and system preferences</p>
       </div>
 
       {error && (
-        <Card className="border-0 shadow-md border-red-200">
+        <Card className="border-0 shadow-md border-red-200 dark:border-red-700">
           <CardContent className="pt-6">
-            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+            <div className="p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-md">
               {error}
             </div>
           </CardContent>
@@ -139,7 +140,7 @@ export default function SettingsPage() {
         <Card className="border-0 shadow-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-blue-600" />
+              <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               Company Information
             </CardTitle>
             <CardDescription>Basic company details for invoices and bills</CardDescription>
@@ -175,7 +176,7 @@ export default function SettingsPage() {
                   onChange={(e) => handleChange('companyLogo', e.target.value)}
                   placeholder="https://lapatola.com/logo.png"
                 />
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   Current: {settings.companyLogo || 'Using default logo'}
                 </p>
               </div>
@@ -208,7 +209,7 @@ export default function SettingsPage() {
         <Card className="border-0 shadow-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-green-600" />
+              <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
               Tax & Legal Information
             </CardTitle>
             <CardDescription>Required for GST invoices and compliance</CardDescription>
@@ -225,7 +226,7 @@ export default function SettingsPage() {
                   maxLength={15}
                   pattern="[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}"
                 />
-                <p className="text-xs text-gray-500">15 characters (e.g., 22AAAAA0000A1Z5)</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">15 characters (e.g., 22AAAAA0000A1Z5)</p>
               </div>
 
               <div className="space-y-2">
@@ -238,7 +239,7 @@ export default function SettingsPage() {
                   maxLength={10}
                   pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
                 />
-                <p className="text-xs text-gray-500">10 characters (e.g., AAAAA1234A)</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">10 characters (e.g., AAAAA1234A)</p>
               </div>
 
               <div className="space-y-2">
@@ -258,7 +259,7 @@ export default function SettingsPage() {
         <Card className="border-0 shadow-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-purple-600" />
+              <MapPin className="h-5 w-5 text-purple-600 dark:text-purple-400" />
               Address Information
             </CardTitle>
             <CardDescription>Address details for invoices</CardDescription>
@@ -266,11 +267,10 @@ export default function SettingsPage() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="registeredOfficeAddress">Registered Office Address *</Label>
-              <textarea
+              <Textarea
                 id="registeredOfficeAddress"
                 value={settings.registeredOfficeAddress}
                 onChange={(e) => handleChange('registeredOfficeAddress', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[80px]"
                 placeholder="Enter complete registered office address"
                 required
               />
@@ -293,7 +293,7 @@ export default function SettingsPage() {
         <Card className="border-0 shadow-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5 text-orange-600" />
+              <Settings className="h-5 w-5 text-orange-600 dark:text-orange-400" />
               Business Settings
             </CardTitle>
             <CardDescription>Payment and discount preferences</CardDescription>
@@ -331,7 +331,7 @@ export default function SettingsPage() {
         <Card className="border-0 shadow-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Palette className="h-5 w-5 text-pink-600" />
+              <Palette className="h-5 w-5 text-pink-600 dark:text-pink-400" />
               Invoice Customization
             </CardTitle>
             <CardDescription>Customize invoice appearance and content</CardDescription>
@@ -379,23 +379,23 @@ export default function SettingsPage() {
 
             <div className="space-y-2">
               <Label htmlFor="invoiceFooterNote">Invoice Footer Note</Label>
-              <textarea
+              <Textarea
                 id="invoiceFooterNote"
                 value={settings.invoiceFooterNote || ''}
                 onChange={(e) => handleChange('invoiceFooterNote', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[60px]"
                 placeholder="Additional note to display at the bottom of invoices"
+                className="min-h-[60px]"
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="termsAndConditions">Terms & Conditions</Label>
-              <textarea
+              <Textarea
                 id="termsAndConditions"
                 value={settings.termsAndConditions || ''}
                 onChange={(e) => handleChange('termsAndConditions', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[100px]"
                 placeholder="Enter terms and conditions for invoices"
+                className="min-h-[100px]"
               />
             </div>
           </CardContent>

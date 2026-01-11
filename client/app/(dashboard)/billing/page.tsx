@@ -653,7 +653,7 @@ export default function BillingPage() {
                   {searchResults.map((product) => (
                     <div
                       key={product._id}
-                      className="p-3 border-b hover:bg-gray-50 cursor-pointer flex items-center justify-between"
+                      className="p-3 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer flex items-center justify-between"
                       onClick={async () => {
                         // Fetch full product details to ensure we have GST percentage
                         try {
@@ -670,8 +670,8 @@ export default function BillingPage() {
                       }}
                     >
                       <div>
-                        <p className="font-medium text-gray-900">{product.name}</p>
-                        <p className="text-sm text-gray-500">
+                        <p className="font-medium text-gray-900 dark:text-white">{product.name}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
                           {product.sku} • Stock: {product.stockQuantity} • {formatCurrency(product.sellingPrice)}
                           {product.gstPercentage !== undefined && product.gstPercentage !== null && (
                             <span className="text-blue-600 font-medium ml-2">• GST: {product.gstPercentage}%</span>
@@ -698,8 +698,8 @@ export default function BillingPage() {
             </CardHeader>
             <CardContent>
               {cart.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
-                  <ShoppingCart className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                  <ShoppingCart className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 mb-4" />
                   <p>Cart is empty. Search and add products.</p>
                 </div>
               ) : (
@@ -707,11 +707,11 @@ export default function BillingPage() {
                   {cart.map((item) => (
                     <div
                       key={item.productId}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                      className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
                     >
                       <div className="flex-1">
-                        <p className="font-medium text-gray-900">{item.productName}</p>
-                        <p className="text-sm text-gray-500">{formatCurrency(item.price)} each</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{item.productName}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{formatCurrency(item.price)} each</p>
                         {item.gstPercentage !== undefined && item.gstPercentage > 0 && (
                           <p className="text-xs text-blue-600 font-medium">
                             GST ({item.gstPercentage}%): {formatCurrency(item.gstAmount || 0)}
@@ -737,10 +737,10 @@ export default function BillingPage() {
                           </Button>
                         </div>
                         <div className="text-right w-32">
-                          <p className="text-xs text-gray-500 line-through">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 line-through">
                             {formatCurrency(item.total)}
                           </p>
-                          <p className="font-semibold text-gray-900">
+                          <p className="font-semibold text-gray-900 dark:text-white">
                             {formatCurrency(item.totalWithGst || item.total)}
                           </p>
                         </div>
@@ -806,7 +806,7 @@ export default function BillingPage() {
                       }}
                       className="rounded"
                     />
-                    <span className="text-gray-600">Add PAN Card</span>
+                    <span className="text-gray-600 dark:text-gray-400">Add PAN Card</span>
                   </label>
                 </div>
                 {showPanCard && (
@@ -823,7 +823,7 @@ export default function BillingPage() {
                   />
                 )}
                 {showPanCard && customerPanCard.length > 0 && customerPanCard.length !== 10 && (
-                  <p className="text-xs text-gray-500">PAN card must be 10 characters (e.g., ABCDE1234F)</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">PAN card must be 10 characters (e.g., ABCDE1234F)</p>
                 )}
               </div>
 
@@ -866,7 +866,7 @@ export default function BillingPage() {
                         className="font-mono"
                       />
                       {customerGstNumber.length > 0 && customerGstNumber.length !== 15 && (
-                        <p className="text-xs text-gray-500">GST number must be 15 characters</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">GST number must be 15 characters</p>
                       )}
                     </div>
                     <div className="space-y-2">
@@ -892,21 +892,21 @@ export default function BillingPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Subtotal:</span>
-                  <span className="font-medium">{formatCurrency(subtotal)}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Subtotal:</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{formatCurrency(subtotal)}</span>
                 </div>
                 {totalAdditionalCharges > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Additional Services:</span>
-                    <span className="font-medium text-blue-600">{formatCurrency(totalAdditionalCharges)}</span>
+                    <span className="text-gray-600 dark:text-gray-400">Additional Services:</span>
+                    <span className="font-medium text-blue-600 dark:text-blue-400">{formatCurrency(totalAdditionalCharges)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Total GST:</span>
-                  <span className="font-medium">{formatCurrency(totalGstAmount)}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Total GST:</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{formatCurrency(totalGstAmount)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Discount (%):</span>
+                  <span className="text-gray-600 dark:text-gray-400">Discount (%):</span>
                   <div className="flex items-center gap-2">
                     <Input
                       type="number"
@@ -920,17 +920,17 @@ export default function BillingPage() {
                       max="100"
                       step="0.1"
                     />
-                    <span className="text-xs text-gray-500">%</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">%</span>
                     {discount > 0 && (
-                      <span className="text-xs text-gray-600">
+                      <span className="text-xs text-gray-600 dark:text-gray-400">
                         ({formatCurrency((cart.reduce((sum, item) => sum + item.total, 0) * discount) / 100)})
                       </span>
                     )}
                   </div>
                 </div>
-                <div className="border-t pt-2 flex justify-between">
-                  <span className="font-semibold text-gray-900">Grand Total:</span>
-                  <span className="font-bold text-lg text-gray-900">{formatCurrency(grandTotal)}</span>
+                <div className="border-t dark:border-gray-700 pt-2 flex justify-between">
+                  <span className="font-semibold text-gray-900 dark:text-white">Grand Total:</span>
+                  <span className="font-bold text-lg text-gray-900 dark:text-white">{formatCurrency(grandTotal)}</span>
                 </div>
               </div>
 
@@ -955,7 +955,7 @@ export default function BillingPage() {
                 {showStitchingServices && (
                   <div className="space-y-3 pt-2">
                     {additionalCharges.map((charge, index) => (
-                      <div key={index} className="p-3 border rounded-lg space-y-2 bg-gray-50">
+                      <div key={index} className="p-3 border dark:border-gray-700 rounded-lg space-y-2 bg-gray-50 dark:bg-gray-800">
                         <div className="grid grid-cols-2 gap-2">
                           <div className="space-y-1">
                             <Label className="text-xs">Service Name</Label>
@@ -1011,7 +1011,7 @@ export default function BillingPage() {
                           </div>
                         </div>
                         {charge.serviceName && charge.rate > 0 && (
-                          <div className="text-xs text-gray-600 text-right">
+                          <div className="text-xs text-gray-600 dark:text-gray-400 text-right">
                             Total: {formatCurrency(charge.quantity * charge.rate)}
                           </div>
                         )}

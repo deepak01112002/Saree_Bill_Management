@@ -68,8 +68,8 @@ export default function CategoriesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Categories</h1>
-          <p className="text-gray-600 mt-1">Manage product categories</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Categories</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Manage product categories</p>
         </div>
         <div className="flex gap-2">
           <Link href="/products/upload">
@@ -91,7 +91,7 @@ export default function CategoriesPage() {
       <Card className="border-0 shadow-md">
         <CardContent className="pt-6">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
             <Input
               type="text"
               placeholder="Search categories by name or code..."
@@ -113,12 +113,12 @@ export default function CategoriesPage() {
           {loading ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading categories...</p>
+              <p className="text-gray-600 dark:text-gray-400">Loading categories...</p>
             </div>
           ) : filteredCategories.length === 0 ? (
             <div className="text-center py-12">
-              <FolderOpen className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <p className="text-gray-600">
+              <FolderOpen className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 mb-4" />
+              <p className="text-gray-600 dark:text-gray-400">
                 {search ? 'No categories found matching your search' : 'No categories yet. Create your first category!'}
               </p>
               {!search && (
@@ -135,25 +135,25 @@ export default function CategoriesPage() {
               {filteredCategories.map((category) => (
                 <div
                   key={category._id}
-                  className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                  className="border dark:border-gray-700 rounded-lg p-4 hover:shadow-md dark:hover:bg-gray-800/50 transition-shadow bg-white dark:bg-gray-800"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <FolderOpen className="h-5 w-5 text-blue-600" />
-                        <h3 className="font-semibold text-gray-900 text-lg">{category.name}</h3>
+                        <FolderOpen className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                        <h3 className="font-semibold text-gray-900 dark:text-white text-lg">{category.name}</h3>
                       </div>
-                      <p className="text-sm text-gray-600 font-mono bg-gray-100 px-2 py-1 rounded inline-block mb-2">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 font-mono bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white px-2 py-1 rounded inline-block mb-2">
                         Code: {category.code}
                       </p>
                       {category.description && (
-                        <p className="text-sm text-gray-600 mt-2">{category.description}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{category.description}</p>
                       )}
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2 mt-4 pt-4 border-t">
+                  <div className="flex flex-col gap-2 mt-4 pt-4 border-t dark:border-gray-700">
                     <Link href={`/products/upload?categoryId=${category._id}`} className="w-full">
-                      <Button variant="outline" size="sm" className="w-full border-blue-600 text-blue-600 hover:bg-blue-50">
+                      <Button variant="outline" size="sm" className="w-full border-blue-600 dark:border-blue-400 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30">
                         <Upload className="mr-2 h-4 w-4" />
                         Upload Excel
                       </Button>
@@ -169,7 +169,7 @@ export default function CategoriesPage() {
                         variant="outline"
                         size="sm"
                         onClick={() => handleDelete(category._id, category.name)}
-                        className="text-red-600 hover:text-red-700 hover:border-red-300 flex-1"
+                        className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:border-red-300 dark:hover:border-red-600 flex-1"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete

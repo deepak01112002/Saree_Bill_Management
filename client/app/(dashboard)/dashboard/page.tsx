@@ -110,8 +110,8 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">
           {!mounted ? (
             "Welcome back! Here's what's happening today."
           ) : isUserAdmin ? (
@@ -145,18 +145,18 @@ export default function DashboardPage() {
             return (
               <Card key={stat.title} className="border-0 shadow-md hover:shadow-lg transition-shadow">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">
+                  <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                     {stat.title}
                   </CardTitle>
-                  <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                    <Icon className={`h-5 w-5 ${stat.color}`} />
+                  <div className={`p-2 rounded-lg ${stat.bgColor} dark:bg-opacity-20`}>
+                    <Icon className={`h-5 w-5 ${stat.color} dark:opacity-90`} />
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <div className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {stat.change && (
-                      <span className={stat.change.startsWith('+') ? 'text-green-600' : stat.change.startsWith('-') ? 'text-red-600' : 'text-gray-600'}>
+                      <span className={stat.change.startsWith('+') ? 'text-green-600 dark:text-green-400' : stat.change.startsWith('-') ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'}>
                         {stat.change}
                       </span>
                     )}
@@ -259,11 +259,11 @@ export default function DashboardPage() {
                 {stats.topProducts.map((product, index) => (
                   <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
-                      <p className="font-medium text-gray-900">{product.name}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{product.name}</p>
                       <p className="text-sm text-gray-500">SKU: {product.sku}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-gray-900">{formatCurrency(product.revenue)}</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">{formatCurrency(product.revenue)}</p>
                       <p className="text-sm text-gray-500">{product.quantity} sold</p>
                     </div>
                   </div>

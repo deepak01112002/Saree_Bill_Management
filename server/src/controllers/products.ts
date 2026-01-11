@@ -345,6 +345,13 @@ export const uploadProductsFromExcel = async (req: AuthRequest, res: Response) =
           console.log(`Row ${rowNumber}: GST column not found. Available columns: ${Object.keys(row).join(', ')}`);
         }
         
+        // Parse HSN Code column
+        const hsnCodeStr = getColumnValue(row, [
+          'HSN', 'HSN Code', 'HSNCODE', 'hsn', 'hsnCode', 'hsn_code',
+          'HSN CODE', 'Hsn Code', 'HSNCode', 'Harmonized System Code'
+        ]);
+        const hsnCode = hsnCodeStr && hsnCodeStr.trim() !== '' ? hsnCodeStr.trim().toUpperCase() : undefined;
+        
         // Extract brand and color from product name if not in separate columns
         // Format: "Royal Double Ikat Patola Saree – Red"
         let brand = getColumnValue(row, ['Brand', 'brand', 'Supplier', 'supplier', 'BRAND', 'Brand Name']);
@@ -453,6 +460,10 @@ export const uploadProductsFromExcel = async (req: AuthRequest, res: Response) =
             // Update GST percentage (including 0)
             if (gstPercentage !== undefined && gstPercentage !== null && !isNaN(gstPercentage)) {
               existingProduct.gstPercentage = gstPercentage;
+            }
+            // Update HSN Code if provided
+            if (hsnCode && hsnCode.trim()) {
+              existingProduct.hsnCode = hsnCode.trim().toUpperCase();
             }
             
             await existingProduct.save();
@@ -572,6 +583,7 @@ export const uploadProductsFromExcel = async (req: AuthRequest, res: Response) =
           sellingPrice,
           mrp: mrp > 0 ? mrp : undefined,
           gstPercentage: (gstPercentage !== undefined && gstPercentage !== null && !isNaN(gstPercentage)) ? gstPercentage : undefined,
+          hsnCode: hsnCode ? hsnCode.trim().toUpperCase() : undefined,
           sku,
           productCode: productCode ? productCode.trim().toUpperCase() : undefined,
           stockQuantity,

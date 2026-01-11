@@ -74,8 +74,8 @@ export default function UsersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-          <p className="text-gray-600 mt-1">Manage staff and admin users</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">User Management</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Manage staff and admin users</p>
         </div>
         <Link href="/users/add">
           <Button className="bg-gradient-to-r from-blue-600 to-purple-600">
@@ -90,7 +90,7 @@ export default function UsersPage() {
         <CardContent className="pt-6">
           <div className="flex gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
               <Input
                 type="text"
                 placeholder="Search users by name or email..."
@@ -109,7 +109,7 @@ export default function UsersPage() {
                   setRoleFilter(e.target.value);
                   setPage(1);
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-11"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-11"
               >
                 <option value="">All Roles</option>
                 <option value="admin">Admin</option>
@@ -130,13 +130,13 @@ export default function UsersPage() {
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-4 text-gray-600">Loading users...</p>
+              <p className="mt-4 text-gray-600 dark:text-gray-400">Loading users...</p>
             </div>
           ) : users.length === 0 ? (
             <div className="text-center py-12">
-              <Users className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-4 text-lg font-medium text-gray-900">No users found</h3>
-              <p className="mt-2 text-gray-600">
+              <Users className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+              <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">No users found</h3>
+              <p className="mt-2 text-gray-600 dark:text-gray-400">
                 {search || roleFilter ? 'Try a different search term' : 'Get started by adding your first user'}
               </p>
             </div>
@@ -145,18 +145,18 @@ export default function UsersPage() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b">
-                      <th className="text-left p-4 font-semibold text-gray-700">User</th>
-                      <th className="text-left p-4 font-semibold text-gray-700">Email</th>
-                      <th className="text-left p-4 font-semibold text-gray-700">Role</th>
-                      <th className="text-left p-4 font-semibold text-gray-700">Status</th>
-                      <th className="text-left p-4 font-semibold text-gray-700">Created</th>
-                      <th className="text-center p-4 font-semibold text-gray-700">Actions</th>
+                    <tr className="border-b dark:border-gray-700">
+                      <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">User</th>
+                      <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Email</th>
+                      <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Role</th>
+                      <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Status</th>
+                      <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Created</th>
+                      <th className="text-center p-4 font-semibold text-gray-700 dark:text-gray-300">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {users.map((user) => (
-                      <tr key={user._id} className="border-b hover:bg-gray-50">
+                      <tr key={user._id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50">
                         <td className="p-4">
                           <div className="flex items-center gap-3">
                             {user.profilePhoto ? (
@@ -171,24 +171,24 @@ export default function UsersPage() {
                               </div>
                             )}
                             <div>
-                              <p className="font-medium text-gray-900">{user.name}</p>
+                              <p className="font-medium text-gray-900 dark:text-white">{user.name}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="p-4 text-gray-700">
+                        <td className="p-4 text-gray-700 dark:text-gray-300">
                           <div className="flex items-center gap-2">
-                            <Mail className="h-4 w-4 text-gray-400" />
+                            <Mail className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                             {user.email}
                           </div>
                         </td>
                         <td className="p-4">
                           {user.role === 'admin' ? (
-                            <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold flex items-center gap-1 w-fit">
+                            <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm font-semibold flex items-center gap-1 w-fit">
                               <Shield className="h-3 w-3" />
                               Admin
                             </span>
                           ) : (
-                            <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold flex items-center gap-1 w-fit">
+                            <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-semibold flex items-center gap-1 w-fit">
                               <UserIcon className="h-3 w-3" />
                               Staff
                             </span>
@@ -196,18 +196,18 @@ export default function UsersPage() {
                         </td>
                         <td className="p-4">
                           {user.isActive ? (
-                            <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                            <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full text-sm font-semibold">
                               Active
                             </span>
                           ) : (
-                            <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-semibold">
+                            <span className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full text-sm font-semibold">
                               Inactive
                             </span>
                           )}
                         </td>
-                        <td className="p-4 text-gray-600 text-sm">
+                        <td className="p-4 text-gray-600 dark:text-gray-400 text-sm">
                           <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-gray-400" />
+                            <Calendar className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                             {formatDate(user.createdAt)}
                           </div>
                         </td>
@@ -222,7 +222,7 @@ export default function UsersPage() {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleDelete(user._id, user.name)}
-                              className="text-red-600 hover:text-red-700"
+                              className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -237,7 +237,7 @@ export default function UsersPage() {
               {/* Pagination */}
               {totalPages > 1 && (
                 <div className="flex items-center justify-between mt-6">
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     Showing page {page} of {totalPages} ({total} total)
                   </p>
                   <div className="flex gap-2">

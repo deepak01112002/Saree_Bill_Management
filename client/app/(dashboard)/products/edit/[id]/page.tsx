@@ -24,6 +24,7 @@ interface ProductFormData {
   stockQuantity: number;
   purchaseDate: string;
   category?: string;
+  hsnCode?: string;
 }
 
 interface Category {
@@ -100,6 +101,7 @@ export default function EditProductPage() {
         stockQuantity: product.stockQuantity || 0,
         purchaseDate: purchaseDate,
         category: product.category?._id || product.category || '',
+        hsnCode: product.hsnCode || '',
       });
       
       setPriceLocked(product.priceLocked || false);
@@ -348,6 +350,21 @@ export default function EditProductPage() {
                 {errors.stockQuantity && (
                   <p className="text-sm text-red-600">{errors.stockQuantity.message}</p>
                 )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="hsnCode">HSN Code</Label>
+                <Input
+                  id="hsnCode"
+                  {...register('hsnCode')}
+                  placeholder="e.g., 5408, 6304"
+                  onChange={(e) => {
+                    const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                    setValue('hsnCode', value);
+                  }}
+                  maxLength={20}
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400">Harmonized System of Nomenclature code for GST</p>
               </div>
 
               <div className="space-y-2">

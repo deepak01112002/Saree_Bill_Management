@@ -205,7 +205,7 @@ function UploadProductsPageContent() {
         <CardContent>
           <div className="space-y-2 text-sm text-gray-700">
             <p><strong>Required columns:</strong> Product Name, Category, Cost Price (Hidden), Selling Price, Current Stock</p>
-            <p><strong>Optional columns:</strong> Product Code (used as SKU if provided), Stock Unit, MRP (₹), <strong>GST Percentage</strong> (e.g., 12, 18, 28)</p>
+            <p><strong>Optional columns:</strong> Product Code (used as SKU if provided), Stock Unit, MRP (₹), <strong>GST Percentage</strong> (e.g., 12, 18, 28), <strong>HSN Code</strong> (e.g., 5408, 6304)</p>
             <p><strong>Note:</strong> If Product Code is provided (e.g., LP-PT-001), it will be used as SKU. Otherwise, SKU will be auto-generated.</p>
             <p className="text-xs text-blue-700 font-medium mt-2">
               💡 <strong>GST Percentage Column:</strong> Use column name "GST Percentage" or "GST%" in your Excel. Enter numeric values only (e.g., 12 for 12%, 18 for 18%). This will be used for automatic GST calculation during billing.

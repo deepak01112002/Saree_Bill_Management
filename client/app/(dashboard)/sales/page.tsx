@@ -33,7 +33,7 @@ export default function SalesPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Loading sales report...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading sales report...</p>
         </div>
       </div>
     );
@@ -42,8 +42,8 @@ export default function SalesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Sales Reports</h1>
-        <p className="text-gray-600 mt-1">View your sales analytics and insights</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Sales Reports</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">View your sales analytics and insights</p>
       </div>
 
       {/* Summary Cards */}
@@ -105,16 +105,16 @@ export default function SalesPage() {
               {report.topProducts.map((product: any, index: number) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
                 >
                   <div>
-                    <p className="font-medium text-gray-900">{product.name}</p>
-                    <p className="text-sm text-gray-500">
+                    <p className="font-medium text-gray-900 dark:text-white">{product.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       Quantity: {product.quantity} • Revenue: {formatCurrency(product.revenue)}
                     </p>
                   </div>
                   <div className="text-right">
-                    <span className="text-lg font-bold text-gray-900">
+                    <span className="text-lg font-bold text-gray-900 dark:text-white">
                       #{index + 1}
                     </span>
                   </div>
@@ -122,7 +122,7 @@ export default function SalesPage() {
               ))}
             </div>
           ) : (
-            <p className="text-center text-gray-500 py-8">No sales data available</p>
+            <p className="text-center text-gray-500 dark:text-gray-400 py-8">No sales data available</p>
           )}
         </CardContent>
       </Card>

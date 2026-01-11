@@ -23,6 +23,7 @@ interface ProductFormData {
   stockQuantity: number;
   purchaseDate: string;
   category?: string;
+  hsnCode?: string;
 }
 
 interface Category {
@@ -170,8 +171,8 @@ export default function AddProductPage() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Add Product</h1>
-          <p className="text-gray-600 mt-1">Add a new product to your inventory</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Add Product</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Add a new product to your inventory</p>
         </div>
       </div>
 
@@ -260,7 +261,7 @@ export default function AddProductPage() {
                   <select
                     id="category"
                     {...register('category')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="">Select a category (optional)</option>
                     {categories.map((cat) => (
@@ -380,6 +381,22 @@ export default function AddProductPage() {
                 {errors.stockQuantity && (
                   <p className="text-sm text-red-600">{errors.stockQuantity.message}</p>
                 )}
+              </div>
+
+              {/* HSN Code */}
+              <div className="space-y-2">
+                <Label htmlFor="hsnCode">HSN Code</Label>
+                <Input
+                  id="hsnCode"
+                  {...register('hsnCode')}
+                  placeholder="e.g., 5408, 6304"
+                  onChange={(e) => {
+                    const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                    setValue('hsnCode', value);
+                  }}
+                  maxLength={20}
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400">Harmonized System of Nomenclature code for GST</p>
               </div>
 
               {/* Purchase Date */}

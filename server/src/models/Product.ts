@@ -10,6 +10,7 @@ export interface IProduct extends Document {
   sellingPrice: number;
   mrp?: number; // Maximum Retail Price
   gstPercentage?: number; // GST Percentage per product (e.g., 12, 18, 28)
+  hsnCode?: string; // HSN (Harmonized System of Nomenclature) Code
   sku: string;
   productCode?: string; // Product Code from Excel (e.g., LP-PT-001)
   stockQuantity: number;
@@ -72,6 +73,11 @@ const ProductSchema = new Schema<IProduct>(
       type: Number,
       min: [0, 'GST percentage cannot be negative'],
       max: [100, 'GST percentage cannot exceed 100%'],
+    },
+    hsnCode: {
+      type: String,
+      trim: true,
+      uppercase: true,
     },
     sku: {
       type: String,

@@ -166,8 +166,8 @@ export default function CreateReturnPage() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Create Return</h1>
-          <p className="text-gray-600 mt-1">Process a product return</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Create Return</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Process a product return</p>
         </div>
       </div>
 
@@ -223,11 +223,11 @@ export default function CreateReturnPage() {
                     return (
                       <div
                         key={item.productId}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                        className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
                       >
                         <div className="flex-1">
                           <p className="font-medium">{item.productName}</p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
                             Qty: {item.quantity} • {formatCurrency(item.price)} each
                           </p>
                         </div>
@@ -334,8 +334,8 @@ export default function CreateReturnPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="text-sm text-gray-600">Refund Amount</p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-sm text-gray-600 dark:text-gray-400">Refund Amount</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatCurrency(calculateRefund())}
                 </p>
               </div>

@@ -154,7 +154,7 @@ export default function ProductsPage() {
                   setSelectedCategory(e.target.value);
                   setPage(1);
                 }}
-                className="w-full px-3 py-2 h-11 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 h-11 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">All Categories</option>
                 {categories.map((cat) => (
@@ -178,13 +178,13 @@ export default function ProductsPage() {
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-4 text-gray-600">Loading products...</p>
+              <p className="mt-4 text-gray-600 dark:text-gray-400">Loading products...</p>
             </div>
           ) : products.length === 0 ? (
             <div className="text-center py-12">
-              <Package className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-4 text-lg font-medium text-gray-900">No products found</h3>
-              <p className="mt-2 text-gray-600">
+              <Package className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+              <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">No products found</h3>
+              <p className="mt-2 text-gray-600 dark:text-gray-400">
                 {search ? 'Try a different search term' : 'Get started by adding your first product'}
               </p>
               {!search && (
@@ -201,43 +201,43 @@ export default function ProductsPage() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b">
-                      <th className="text-left p-4 font-semibold text-gray-700">Product</th>
-                      <th className="text-left p-4 font-semibold text-gray-700">Type</th>
-                      <th className="text-left p-4 font-semibold text-gray-700">Brand</th>
-                      <th className="text-left p-4 font-semibold text-gray-700">SKU</th>
-                      <th className="text-right p-4 font-semibold text-gray-700">Price</th>
-                      <th className="text-right p-4 font-semibold text-gray-700">GST %</th>
-                      <th className="text-right p-4 font-semibold text-gray-700">Stock</th>
-                      <th className="text-center p-4 font-semibold text-gray-700">Actions</th>
+                    <tr className="border-b dark:border-gray-700">
+                      <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Product</th>
+                      <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Type</th>
+                      <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Brand</th>
+                      <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">SKU</th>
+                      <th className="text-right p-4 font-semibold text-gray-700 dark:text-gray-300">Price</th>
+                      <th className="text-right p-4 font-semibold text-gray-700 dark:text-gray-300">GST %</th>
+                      <th className="text-right p-4 font-semibold text-gray-700 dark:text-gray-300">Stock</th>
+                      <th className="text-center p-4 font-semibold text-gray-700 dark:text-gray-300">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {products.map((product) => (
-                      <tr key={product._id} className="border-b hover:bg-gray-50">
+                      <tr key={product._id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50">
                         <td className="p-4">
                           <div>
-                            <p className="font-medium text-gray-900">{product.name}</p>
+                            <p className="font-medium text-gray-900 dark:text-white">{product.name}</p>
                             <div className="flex items-center gap-2 mt-1">
-                              <p className="text-sm text-gray-500">{product.color}</p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">{product.color}</p>
                               {product.category && (
-                                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
+                                <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded">
                                   {product.category.name}
                                 </span>
                               )}
                             </div>
                           </div>
                         </td>
-                        <td className="p-4 text-gray-700">{product.sareeType}</td>
-                        <td className="p-4 text-gray-700">{product.brand}</td>
+                        <td className="p-4 text-gray-700 dark:text-gray-300">{product.sareeType}</td>
+                        <td className="p-4 text-gray-700 dark:text-gray-300">{product.brand}</td>
                         <td className="p-4">
-                          <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+                          <span className="font-mono text-sm bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white px-2 py-1 rounded">
                             {product.sku}
                           </span>
                         </td>
                         <td className="p-4 text-right">
                           <div className="flex items-center justify-end gap-2">
-                            <span className="font-semibold text-gray-900">
+                            <span className="font-semibold text-gray-900 dark:text-white">
                               {formatCurrency(product.sellingPrice)}
                             </span>
                             {product.priceLocked && (
@@ -250,10 +250,10 @@ export default function ProductsPage() {
                         <td className="p-4 text-right">
                           <span className={`font-semibold ${
                             product.gstPercentage === undefined || product.gstPercentage === null
-                              ? 'text-gray-400'
+                              ? 'text-gray-400 dark:text-gray-500'
                               : product.gstPercentage > 0
-                              ? 'text-blue-600'
-                              : 'text-gray-500'
+                              ? 'text-blue-600 dark:text-blue-400'
+                              : 'text-gray-500 dark:text-gray-400'
                           }`}>
                             {product.gstPercentage !== undefined && product.gstPercentage !== null
                               ? `${product.gstPercentage}%`

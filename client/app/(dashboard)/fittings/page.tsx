@@ -60,8 +60,8 @@ export default function FittingsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Fitting Services</h1>
-          <p className="text-gray-600 mt-1">Manage fitting and stitching services</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Fitting Services</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Manage fitting and stitching services</p>
         </div>
         <Link href="/fittings/add">
           <Button className="bg-gradient-to-r from-blue-600 to-purple-600">
@@ -80,13 +80,13 @@ export default function FittingsPage() {
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-4 text-gray-600">Loading fittings...</p>
+              <p className="mt-4 text-gray-600 dark:text-gray-400">Loading fittings...</p>
             </div>
           ) : fittings.length === 0 ? (
             <div className="text-center py-12">
-              <Scissors className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-4 text-lg font-medium text-gray-900">No fitting services found</h3>
-              <p className="mt-2 text-sm text-gray-500">Get started by creating a new fitting service</p>
+              <Scissors className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+              <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">No fitting services found</h3>
+              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Get started by creating a new fitting service</p>
               <Link href="/fittings/add">
                 <Button className="mt-4">Add Fitting Service</Button>
               </Link>
@@ -95,25 +95,25 @@ export default function FittingsPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b">
-                    <th className="text-left p-4 font-semibold">Service Name</th>
-                    <th className="text-left p-4 font-semibold">Description</th>
-                    <th className="text-left p-4 font-semibold">Unit</th>
-                    <th className="text-right p-4 font-semibold">Rate</th>
-                    <th className="text-center p-4 font-semibold">Status</th>
-                    <th className="text-left p-4 font-semibold">Created</th>
-                    <th className="text-center p-4 font-semibold">Actions</th>
+                  <tr className="border-b dark:border-gray-700">
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Service Name</th>
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Description</th>
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Unit</th>
+                    <th className="text-right p-4 font-semibold text-gray-700 dark:text-gray-300">Rate</th>
+                    <th className="text-center p-4 font-semibold text-gray-700 dark:text-gray-300">Status</th>
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Created</th>
+                    <th className="text-center p-4 font-semibold text-gray-700 dark:text-gray-300">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {fittings.map((fitting) => (
-                    <tr key={fitting._id} className="border-b hover:bg-gray-50">
-                      <td className="p-4 font-semibold text-gray-900">{fitting.serviceName}</td>
-                      <td className="p-4 text-gray-600">
-                        {fitting.description || <span className="text-gray-400">No description</span>}
+                    <tr key={fitting._id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                      <td className="p-4 font-semibold text-gray-900 dark:text-white">{fitting.serviceName}</td>
+                      <td className="p-4 text-gray-600 dark:text-gray-400">
+                        {fitting.description || <span className="text-gray-400 dark:text-gray-500">No description</span>}
                       </td>
-                      <td className="p-4 text-gray-700 capitalize">{fitting.unit}</td>
-                      <td className="p-4 text-right font-semibold text-gray-900">
+                      <td className="p-4 text-gray-700 dark:text-gray-300 capitalize">{fitting.unit}</td>
+                      <td className="p-4 text-right font-semibold text-gray-900 dark:text-white">
                         {formatCurrency(fitting.rate)} / {fitting.unit}
                       </td>
                       <td className="p-4 text-center">

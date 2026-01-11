@@ -46,39 +46,39 @@ export default function StockPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Stock Management</h1>
-        <p className="text-gray-600 mt-1">Monitor inventory levels and stock movements</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Stock Management</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">Monitor inventory levels and stock movements</p>
       </div>
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="border-0 shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Products</CardTitle>
-            <Package className="h-5 w-5 text-blue-600" />
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Products</CardTitle>
+            <Package className="h-5 w-5 text-blue-600 dark:text-blue-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{products.length}</div>
+            <div className="text-2xl font-bold text-gray-900 dark:text-white">{products.length}</div>
           </CardContent>
         </Card>
 
         <Card className="border-0 shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Low Stock</CardTitle>
-            <AlertTriangle className="h-5 w-5 text-orange-600" />
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">Low Stock</CardTitle>
+            <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{lowStockCount}</div>
+            <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{lowStockCount}</div>
           </CardContent>
         </Card>
 
         <Card className="border-0 shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Out of Stock</CardTitle>
-            <TrendingDown className="h-5 w-5 text-red-600" />
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">Out of Stock</CardTitle>
+            <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{outOfStockCount}</div>
+            <div className="text-2xl font-bold text-red-600 dark:text-red-400">{outOfStockCount}</div>
           </CardContent>
         </Card>
       </div>
@@ -87,24 +87,24 @@ export default function StockPage() {
         {/* Low Stock Alert */}
         <Card className="border-0 shadow-md">
           <CardHeader>
-            <CardTitle className="text-orange-600">Low Stock Items</CardTitle>
+            <CardTitle className="text-orange-600 dark:text-orange-400">Low Stock Items</CardTitle>
             <CardDescription>Products with stock less than 10</CardDescription>
           </CardHeader>
           <CardContent>
             {lowStockProducts.length === 0 ? (
-              <p className="text-center text-gray-500 py-8">No low stock items</p>
+              <p className="text-center text-gray-500 dark:text-gray-400 py-8">No low stock items</p>
             ) : (
               <div className="space-y-2">
                 {lowStockProducts.slice(0, 10).map((product) => (
                   <div
                     key={product._id}
-                    className="flex items-center justify-between p-3 bg-orange-50 rounded-lg"
+                    className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg"
                   >
                     <div>
-                      <p className="font-medium">{product.name}</p>
-                      <p className="text-sm text-gray-500">{product.sku}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{product.name}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{product.sku}</p>
                     </div>
-                    <span className="font-semibold text-orange-600">{product.stockQuantity}</span>
+                    <span className="font-semibold text-orange-600 dark:text-orange-400">{product.stockQuantity}</span>
                   </div>
                 ))}
               </div>
@@ -115,24 +115,24 @@ export default function StockPage() {
         {/* Out of Stock */}
         <Card className="border-0 shadow-md">
           <CardHeader>
-            <CardTitle className="text-red-600">Out of Stock</CardTitle>
+            <CardTitle className="text-red-600 dark:text-red-400">Out of Stock</CardTitle>
             <CardDescription>Products with zero stock</CardDescription>
           </CardHeader>
           <CardContent>
             {outOfStockProducts.length === 0 ? (
-              <p className="text-center text-gray-500 py-8">No out of stock items</p>
+              <p className="text-center text-gray-500 dark:text-gray-400 py-8">No out of stock items</p>
             ) : (
               <div className="space-y-2">
                 {outOfStockProducts.slice(0, 10).map((product) => (
                   <div
                     key={product._id}
-                    className="flex items-center justify-between p-3 bg-red-50 rounded-lg"
+                    className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
                   >
                     <div>
-                      <p className="font-medium">{product.name}</p>
-                      <p className="text-sm text-gray-500">{product.sku}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{product.name}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{product.sku}</p>
                     </div>
-                    <span className="font-semibold text-red-600">0</span>
+                    <span className="font-semibold text-red-600 dark:text-red-400">0</span>
                   </div>
                 ))}
               </div>
@@ -151,46 +151,46 @@ export default function StockPage() {
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-4 text-gray-600">Loading transactions...</p>
+              <p className="mt-4 text-gray-600 dark:text-gray-400">Loading transactions...</p>
             </div>
           ) : transactions.length === 0 ? (
-            <p className="text-center text-gray-500 py-8">No transactions found</p>
+            <p className="text-center text-gray-500 dark:text-gray-400 py-8">No transactions found</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b">
-                    <th className="text-left p-4 font-semibold">Type</th>
-                    <th className="text-left p-4 font-semibold">Product</th>
-                    <th className="text-right p-4 font-semibold">Quantity</th>
-                    <th className="text-right p-4 font-semibold">Previous</th>
-                    <th className="text-right p-4 font-semibold">New Stock</th>
-                    <th className="text-left p-4 font-semibold">Date</th>
+                  <tr className="border-b dark:border-gray-700">
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Type</th>
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Product</th>
+                    <th className="text-right p-4 font-semibold text-gray-700 dark:text-gray-300">Quantity</th>
+                    <th className="text-right p-4 font-semibold text-gray-700 dark:text-gray-300">Previous</th>
+                    <th className="text-right p-4 font-semibold text-gray-700 dark:text-gray-300">New Stock</th>
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Date</th>
                   </tr>
                 </thead>
                 <tbody>
                   {transactions.map((tx) => (
-                    <tr key={tx._id} className="border-b hover:bg-gray-50">
+                    <tr key={tx._id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50">
                       <td className="p-4">
                         <span
                           className={`capitalize px-2 py-1 rounded text-sm ${
                             tx.type === 'in'
-                              ? 'bg-green-100 text-green-700'
+                              ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
                               : tx.type === 'out'
-                              ? 'bg-red-100 text-red-700'
+                              ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
                               : tx.type === 'return'
-                              ? 'bg-blue-100 text-blue-700'
-                              : 'bg-orange-100 text-orange-700'
+                              ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                              : 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300'
                           }`}
                         >
                           {tx.type}
                         </span>
                       </td>
-                      <td className="p-4 text-gray-700">{tx.productId}</td>
-                      <td className="p-4 text-right">{tx.quantity}</td>
-                      <td className="p-4 text-right text-gray-600">{tx.previousStock}</td>
-                      <td className="p-4 text-right font-semibold">{tx.newStock}</td>
-                      <td className="p-4 text-gray-600 text-sm">
+                      <td className="p-4 text-gray-700 dark:text-gray-300">{tx.productId}</td>
+                      <td className="p-4 text-right text-gray-900 dark:text-white">{tx.quantity}</td>
+                      <td className="p-4 text-right text-gray-600 dark:text-gray-400">{tx.previousStock}</td>
+                      <td className="p-4 text-right font-semibold text-gray-900 dark:text-white">{tx.newStock}</td>
+                      <td className="p-4 text-gray-600 dark:text-gray-400 text-sm">
                         {formatDateTime(tx.createdAt)}
                       </td>
                     </tr>

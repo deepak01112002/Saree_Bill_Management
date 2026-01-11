@@ -71,8 +71,8 @@ export default function CustomersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Customers</h1>
-          <p className="text-gray-600 mt-1">Manage your customer database</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Customers</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your customer database</p>
         </div>
         <Link href="/customers/add">
           <Button className="bg-gradient-to-r from-blue-600 to-purple-600">
@@ -86,7 +86,7 @@ export default function CustomersPage() {
       <Card className="border-0 shadow-md">
         <CardContent className="pt-6">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
             <Input
               type="text"
               placeholder="Search customers by name, mobile, email, GST, or firm name..."
@@ -111,13 +111,13 @@ export default function CustomersPage() {
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-4 text-gray-600">Loading customers...</p>
+              <p className="mt-4 text-gray-600 dark:text-gray-400">Loading customers...</p>
             </div>
           ) : customers.length === 0 ? (
             <div className="text-center py-12">
-              <Users className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-4 text-lg font-medium text-gray-900">No customers found</h3>
-              <p className="mt-2 text-gray-600">
+              <Users className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+              <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">No customers found</h3>
+              <p className="mt-2 text-gray-600 dark:text-gray-400">
                 {search ? 'Try a different search term' : 'Get started by adding your first customer'}
               </p>
             </div>
@@ -125,36 +125,36 @@ export default function CustomersPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b">
-                    <th className="text-left p-4 font-semibold text-gray-700">Name</th>
-                    <th className="text-left p-4 font-semibold text-gray-700">Mobile</th>
-                    <th className="text-left p-4 font-semibold text-gray-700">Email</th>
-                    <th className="text-left p-4 font-semibold text-gray-700">Firm Name</th>
-                    <th className="text-left p-4 font-semibold text-gray-700">GST Number</th>
-                    <th className="text-right p-4 font-semibold text-gray-700">Total Spent</th>
-                    <th className="text-center p-4 font-semibold text-gray-700">Orders</th>
-                    <th className="text-center p-4 font-semibold text-gray-700">Actions</th>
+                  <tr className="border-b dark:border-gray-700">
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Name</th>
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Mobile</th>
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Email</th>
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Firm Name</th>
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">GST Number</th>
+                    <th className="text-right p-4 font-semibold text-gray-700 dark:text-gray-300">Total Spent</th>
+                    <th className="text-center p-4 font-semibold text-gray-700 dark:text-gray-300">Orders</th>
+                    <th className="text-center p-4 font-semibold text-gray-700 dark:text-gray-300">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {customers.map((customer) => (
-                    <tr key={customer._id} className="border-b hover:bg-gray-50">
-                      <td className="p-4 font-medium text-gray-900">{customer.name}</td>
-                      <td className="p-4 text-gray-700">{customer.mobileNumber}</td>
-                      <td className="p-4 text-gray-600 text-sm">
-                        {customer.email || <span className="text-gray-400">-</span>}
+                    <tr key={customer._id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                      <td className="p-4 font-medium text-gray-900 dark:text-white">{customer.name}</td>
+                      <td className="p-4 text-gray-700 dark:text-gray-300">{customer.mobileNumber}</td>
+                      <td className="p-4 text-gray-600 dark:text-gray-400 text-sm">
+                        {customer.email || <span className="text-gray-400 dark:text-gray-500">-</span>}
                       </td>
-                      <td className="p-4 text-gray-600 text-sm">
-                        {customer.firmName || <span className="text-gray-400">-</span>}
+                      <td className="p-4 text-gray-600 dark:text-gray-400 text-sm">
+                        {customer.firmName || <span className="text-gray-400 dark:text-gray-500">-</span>}
                       </td>
-                      <td className="p-4 text-gray-600 text-sm font-mono">
-                        {customer.gstNumber || <span className="text-gray-400">-</span>}
+                      <td className="p-4 text-gray-600 dark:text-gray-400 text-sm font-mono">
+                        {customer.gstNumber || <span className="text-gray-400 dark:text-gray-500">-</span>}
                       </td>
-                      <td className="p-4 text-right font-semibold text-gray-900">
+                      <td className="p-4 text-right font-semibold text-gray-900 dark:text-white">
                         {formatCurrency(customer.totalPurchases || 0)}
                       </td>
                       <td className="p-4 text-center">
-                        <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
+                        <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-3 py-1 rounded-full text-sm font-semibold">
                           {customer.purchaseCount || 0}
                         </span>
                       </td>

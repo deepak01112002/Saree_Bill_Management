@@ -116,8 +116,8 @@ export default function RollPolishPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Roll Polish Management</h1>
-          <p className="text-gray-600 mt-1">Track and manage rolls sent for polishing</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Roll Polish Management</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Track and manage rolls sent for polishing</p>
         </div>
         <Link href="/roll-polish/add">
           <Button className="bg-gradient-to-r from-blue-600 to-purple-600">
@@ -166,7 +166,7 @@ export default function RollPolishPage() {
               <div>
                 <Label>Status</Label>
                 <select
-                  className="w-full h-10 px-3 border border-gray-300 rounded-md"
+                  className="w-full h-10 px-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md"
                   value={filters.status}
                   onChange={(e) => setFilters({ ...filters, status: e.target.value })}
                 >
@@ -216,13 +216,13 @@ export default function RollPolishPage() {
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-4 text-gray-600">Loading roll polishes...</p>
+              <p className="mt-4 text-gray-600 dark:text-gray-400">Loading roll polishes...</p>
             </div>
           ) : rollPolishes.length === 0 ? (
             <div className="text-center py-12">
-              <Package className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-4 text-lg font-medium text-gray-900">No roll polish entries found</h3>
-              <p className="mt-2 text-sm text-gray-500">Get started by creating a new roll polish entry</p>
+              <Package className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+              <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">No roll polish entries found</h3>
+              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Get started by creating a new roll polish entry</p>
               <Link href="/roll-polish/add">
                 <Button className="mt-4">Add Roll Polish</Button>
               </Link>
@@ -231,36 +231,36 @@ export default function RollPolishPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b">
-                    <th className="text-left p-4 font-semibold">Roll Number</th>
-                    <th className="text-left p-4 font-semibold">Fabric Type</th>
-                    <th className="text-left p-4 font-semibold">Quantity</th>
-                    <th className="text-left p-4 font-semibold">Vendor</th>
-                    <th className="text-center p-4 font-semibold">Status</th>
-                    <th className="text-left p-4 font-semibold">Sent Date</th>
-                    <th className="text-left p-4 font-semibold">Expected Return</th>
-                    <th className="text-center p-4 font-semibold">Actions</th>
+                  <tr className="border-b dark:border-gray-700">
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Roll Number</th>
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Fabric Type</th>
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Quantity</th>
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Vendor</th>
+                    <th className="text-center p-4 font-semibold text-gray-700 dark:text-gray-300">Status</th>
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Sent Date</th>
+                    <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Expected Return</th>
+                    <th className="text-center p-4 font-semibold text-gray-700 dark:text-gray-300">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rollPolishes.map((roll) => (
-                    <tr key={roll._id} className="border-b hover:bg-gray-50">
-                      <td className="p-4 font-semibold text-gray-900">{roll.rollNumber}</td>
-                      <td className="p-4 text-gray-700">
+                    <tr key={roll._id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                      <td className="p-4 font-semibold text-gray-900 dark:text-white">{roll.rollNumber}</td>
+                      <td className="p-4 text-gray-700 dark:text-gray-300">
                         {roll.fabricType}
                         {roll.colorDesign && (
-                          <span className="text-gray-500 text-sm ml-2">({roll.colorDesign})</span>
+                          <span className="text-gray-500 dark:text-gray-400 text-sm ml-2">({roll.colorDesign})</span>
                         )}
                       </td>
-                      <td className="p-4 text-gray-700">
+                      <td className="p-4 text-gray-700 dark:text-gray-300">
                         {roll.quantity} {roll.unit}
                       </td>
-                      <td className="p-4 text-gray-700">{roll.vendorName}</td>
+                      <td className="p-4 text-gray-700 dark:text-gray-300">{roll.vendorName}</td>
                       <td className="p-4 text-center">{getStatusBadge(roll.status)}</td>
-                      <td className="p-4 text-gray-600 text-sm">
+                      <td className="p-4 text-gray-600 dark:text-gray-400 text-sm">
                         {formatDate(roll.sentDate)}
                       </td>
-                      <td className="p-4 text-gray-600 text-sm">
+                      <td className="p-4 text-gray-600 dark:text-gray-400 text-sm">
                         {roll.expectedReturnDate ? (
                           formatDate(roll.expectedReturnDate)
                         ) : (
