@@ -73,6 +73,8 @@ export default function BillViewPage() {
         createdAt: bill.createdAt,
         companyName: settings.companyName,
         website: settings.website,
+        companyLogo: settings.companyLogo || "https://lapatola.com/cdn/shop/files/Screenshot_2025-12-25_183108.png?v=1766667767&width=535",
+        qrCode: billQRCode,
         gstin: settings.gstin,
         pan: settings.pan,
         cin: settings.cin,
@@ -480,22 +482,33 @@ export default function BillViewPage() {
           {/* Company Logo & Header */}
           <div className="border-b pb-6 mb-6">
             <div className="flex justify-between items-start mb-4">
-              <div className="flex items-center gap-4">
-                <img 
-                  src={settings?.companyLogo || "https://lapatola.com/cdn/shop/files/Screenshot_2025-12-25_183108.png?v=1766667767&width=535"} 
-                  alt={`${settings?.companyName || 'La Patola'} Logo`} 
-                  className="h-20 w-auto print:h-16"
-                  onError={(e) => {
-                    // Fallback if image fails to load
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
-                />
+              <div className="flex items-start gap-4">
+                <div className="flex flex-col items-start">
+                  <img 
+                    src={settings?.companyLogo || "https://lapatola.com/cdn/shop/files/Screenshot_2025-12-25_183108.png?v=1766667767&width=535"} 
+                    alt={`${settings?.companyName || 'Company'} Logo`} 
+                    className="h-28 w-auto print:h-24 mb-2"
+                    onError={(e) => {
+                      // Fallback if image fails to load
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                  <p className="text-xs text-gray-900 mt-1 print:text-xs font-bold">Product of casa export</p>
+                </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-1">{settings?.companyName || 'La Patola'}</h2>
-                  <p className="text-sm text-blue-600 font-medium">{settings?.website || 'www.lapatola.com'}</p>
+                  {/* <p className="text-sm text-blue-600 font-medium">Product of casa export</p> */}
                 </div>
               </div>
-              <div className="text-right">
+              <div className="text-right flex flex-col items-end gap-3">
+                {billQRCode && (
+                  <div>
+                    <img 
+                      src={billQRCode} 
+                      alt="QR Code" 
+                      className="w-20 h-20 print:w-16 print:h-16"
+                    />
+                  </div>
+                )}
                 <div className="text-sm text-gray-600 space-y-1">
                   {settings?.gstin && <p><strong>GSTIN:</strong> {settings.gstin}</p>}
                   {settings?.pan && <p><strong>PAN:</strong> {settings.pan}</p>}
@@ -736,10 +749,10 @@ export default function BillViewPage() {
                 </p>
               </div>
               <div className="space-y-4">
-                <div>
+                {/* <div>
                   <p className="text-sm text-gray-600 mb-8">Customer Signature:</p>
                   <div className="border-b border-gray-400"></div>
-                </div>
+                </div> */}
                 <div>
                   <p className="text-sm text-gray-600 mb-8">Authorized Signatory:</p>
                   <div className="border-b border-gray-400"></div>
@@ -754,7 +767,7 @@ export default function BillViewPage() {
             {settings?.invoiceFooterNote && (
               <p className="text-xs text-gray-600 mt-2">{settings.invoiceFooterNote}</p>
             )}
-            <p className="text-xs text-gray-500 mt-2">For returns, please bring this invoice within 7 days.</p>
+            {/* <p className="text-xs text-gray-500 mt-2">For returns, please bring this invoice within 7 days.</p> */}
           </div>
         </CardContent>
       </Card>

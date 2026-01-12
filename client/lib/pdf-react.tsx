@@ -1,5 +1,5 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 
 // Define styles
 const styles = StyleSheet.create({
@@ -18,10 +18,29 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 10,
   },
+  logoContainer: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    marginBottom: 5,
+  },
+  logo: {
+    width: 90,
+    height: 90,
+    marginBottom: 5,
+  },
   companyName: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 5,
+  },
+  productOfText: {
+    fontSize: 9,
+    color: '#6b7280',
+    marginTop: 3,
+  },
+  qrCode: {
+    width: 60,
+    height: 60,
   },
   website: {
     fontSize: 10,
@@ -112,6 +131,8 @@ interface InvoiceData {
   createdAt: string;
   companyName?: string;
   website?: string;
+  companyLogo?: string;
+  qrCode?: string;
   gstin?: string;
   pan?: string;
   cin?: string;
@@ -181,18 +202,28 @@ export function InvoicePDF({ data }: { data: InvoiceData }) {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.companyInfo}>
-            <View>
-              <Text style={styles.companyName}>{data.companyName || 'La Patola'}</Text>
-              <Text style={styles.website}>{data.website || 'www.lapatola.com'}</Text>
+            <View style={styles.logoContainer}>
+              {data.companyLogo && (
+                <Image src={data.companyLogo} style={styles.logo} />
+              )}
+              <Text style={styles.website}>Product of casa export</Text>
+              {/* <Text style={styles.website}>{data.website || 'www.lapatola.com'}</Text> */}
             </View>
-            <View>
-              {data.gstin && <Text style={{ fontSize: 9 }}>GSTIN: {data.gstin}</Text>}
-              {data.pan && <Text style={{ fontSize: 9 }}>PAN: {data.pan}</Text>}
-              {data.cin && <Text style={{ fontSize: 9 }}>CIN: {data.cin}</Text>}
-              {data.registeredOfficeAddress && (
-                <Text style={{ fontSize: 8, marginTop: 5, maxWidth: 150 }}>
-                  {data.registeredOfficeAddress}
-                </Text>
+            <View style={{ flexDirection: 'row', gap: 15 }}>
+              <View>
+                {data.gstin && <Text style={{ fontSize: 9 }}>GSTIN: {data.gstin}</Text>}
+                {data.pan && <Text style={{ fontSize: 9 }}>PAN: {data.pan}</Text>}
+                {data.cin && <Text style={{ fontSize: 9 }}>CIN: {data.cin}</Text>}
+                {data.registeredOfficeAddress && (
+                  <Text style={{ fontSize: 8, marginTop: 5, maxWidth: 150 }}>
+                    {data.registeredOfficeAddress}
+                  </Text>
+                )}
+              </View>
+              {data.qrCode && (
+                <View>
+                  <Image src={data.qrCode} style={styles.qrCode} />
+                </View>
               )}
             </View>
           </View>
@@ -364,7 +395,7 @@ export function InvoicePDF({ data }: { data: InvoiceData }) {
           {data.invoiceFooterNote && (
             <Text style={{ fontSize: 9, marginTop: 5, marginBottom: 5 }}>{data.invoiceFooterNote}</Text>
           )}
-          <Text style={{ fontSize: 9, marginTop: 5 }}>For returns, please bring this invoice within 7 days.</Text>
+          {/* <Text style={{ fontSize: 9, marginTop: 5 }}>For returns, please bring this invoice within 7 days.</Text> */}
         </View>
       </Page>
     </Document>
@@ -377,6 +408,8 @@ export interface QuotationData {
   createdAt: string;
   companyName?: string;
   website?: string;
+  companyLogo?: string;
+  qrCode?: string;
   gstin?: string;
   pan?: string;
   cin?: string;
@@ -437,18 +470,28 @@ export function QuotationPDF({ data }: { data: QuotationData }) {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.companyInfo}>
-            <View>
-              <Text style={styles.companyName}>{data.companyName || 'La Patola'}</Text>
+            <View style={styles.logoContainer}>
+              {data.companyLogo && (
+                <Image src={data.companyLogo} style={styles.logo} />
+              )}
+              <Text style={styles.productOfText}>Product of casa export</Text>
               <Text style={styles.website}>{data.website || 'www.lapatola.com'}</Text>
             </View>
-            <View>
-              {data.gstin && <Text style={{ fontSize: 9 }}>GSTIN: {data.gstin}</Text>}
-              {data.pan && <Text style={{ fontSize: 9 }}>PAN: {data.pan}</Text>}
-              {data.cin && <Text style={{ fontSize: 9 }}>CIN: {data.cin}</Text>}
-              {data.registeredOfficeAddress && (
-                <Text style={{ fontSize: 8, marginTop: 5, maxWidth: 150 }}>
-                  {data.registeredOfficeAddress}
-                </Text>
+            <View style={{ flexDirection: 'row', gap: 15 }}>
+              <View>
+                {data.gstin && <Text style={{ fontSize: 9 }}>GSTIN: {data.gstin}</Text>}
+                {data.pan && <Text style={{ fontSize: 9 }}>PAN: {data.pan}</Text>}
+                {data.cin && <Text style={{ fontSize: 9 }}>CIN: {data.cin}</Text>}
+                {data.registeredOfficeAddress && (
+                  <Text style={{ fontSize: 8, marginTop: 5, maxWidth: 150 }}>
+                    {data.registeredOfficeAddress}
+                  </Text>
+                )}
+              </View>
+              {data.qrCode && (
+                <View>
+                  <Image src={data.qrCode} style={styles.qrCode} />
+                </View>
               )}
             </View>
           </View>

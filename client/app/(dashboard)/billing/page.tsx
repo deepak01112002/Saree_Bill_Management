@@ -54,6 +54,7 @@ export default function BillingPage() {
   const [barcodeInput, setBarcodeInput] = useState('');
   const barcodeInputRef = useRef<HTMLInputElement | null>(null);
   const barcodeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isScanningRef = useRef(false);
 
   useEffect(() => {
     if (searchQuery.length > 2) {
@@ -122,30 +123,7 @@ export default function BillingPage() {
     }
   }, []);
 
-  // Process barcode scanner input
-  useEffect(() => {
-    if (!barcodeInput) return;
-
-    // Clear previous timeout
-    if (barcodeTimeoutRef.current) {
-      clearTimeout(barcodeTimeoutRef.current);
-    }
-
-    // Barcode scanners typically send data very quickly and end with Enter
-    // We'll detect when input stops (scanner finished) and process it
-    barcodeTimeoutRef.current = setTimeout(async () => {
-      if (barcodeInput.length > 0) {
-        await handleBarcodeScan(barcodeInput.trim());
-        setBarcodeInput('');
-      }
-    }, 150); // Wait 150ms after last character to detect scanner input
-
-    return () => {
-      if (barcodeTimeoutRef.current) {
-        clearTimeout(barcodeTimeoutRef.current);
-      }
-    };
-  }, [barcodeInput]);
+  
 
   const handleBarcodeScan = async (scannedValue: string) => {
     try {
@@ -210,10 +188,22 @@ export default function BillingPage() {
 
   const handleBarcodeInputKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     // If Enter is pressed, process immediately (barcode scanners often send Enter)
-    if (e.key === 'Enter' && barcodeInput.trim()) {
-      e.preventDefault();
+    if (e.key !== 'Enter') return;
+
+    e.preventDefault();
+  
+    if (!barcodeInput.trim()) return;
+    if (isScanningRef.current) return; // 🔒 prevent double scan
+  
+    isScanningRef.current = true;
+  
+    try {
       await handleBarcodeScan(barcodeInput.trim());
+    } finally {
       setBarcodeInput('');
+      setTimeout(() => {
+        isScanningRef.current = false;
+      }, 300); // small cooldown
     }
   };
 
@@ -650,7 +640,7 @@ export default function BillingPage() {
               {/* Barcode Scanner Input - For External Handheld Scanners */}
               <div className="mb-4 p-3 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-lg">
                 <Label className="text-sm font-semibold text-green-800 dark:text-green-200 mb-2 block">
-                  Barcode Scanner (Test Mode)
+                  Barcode Scanner (Click on this Input to Scan Barcode)
                 </Label>
                 <Input
                   ref={barcodeInputRef}
@@ -663,7 +653,7 @@ export default function BillingPage() {
                   className="bg-white dark:bg-gray-800 border-green-300 dark:border-green-600 focus:ring-green-500"
                 />
                 <p className="text-xs text-green-700 dark:text-green-300 mt-1">
-                  Use this field to test barcode scanning. External scanners will auto-fill here.
+                  Use this field for barcode scanning. External scanners will auto-fill here.
                 </p>
               </div>
               
