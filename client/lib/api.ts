@@ -310,6 +310,15 @@ export const productsAPI = {
     return response.json();
   },
 
+  getBySku: async (sku: string) => {
+    const response = await apiFetch(`/products/sku/${encodeURIComponent(sku)}`);
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Product not found');
+    }
+    return response.json();
+  },
+
   create: async (data: any) => {
     const response = await apiFetch('/products', {
       method: 'POST',

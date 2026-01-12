@@ -8,7 +8,7 @@ export interface BarcodePrintProduct {
   mrp?: number;
 }
 
-export type PrintFormat = 'thermal' | 'normal';
+export type PrintFormat = 'thermal' | 'normal' | '2x3inch';
 
 export interface PrintOptions {
   format: PrintFormat;
@@ -379,6 +379,222 @@ export async function generateNormalPrintHTML(
 }
 
 /**
+ * Generate HTML for 2 inch x 3 inch barcode labels
+ * Shows: SKU, Product Name, Price, Barcode
+ */
+export async function generate2x3InchPrintHTML(
+  products: BarcodePrintProduct[],
+  options: PrintOptions = { format: '2x3inch' }
+): Promise<string> {
+  // 2 inch = 50.8mm, 3 inch = 76.2mm
+  // A4 page: 210mm x 297mm
+  // With 5mm margins: 200mm x 287mm available
+  // Can fit: 3 labels width (3 x 50.8 = 152.4mm) with gaps
+  // Can fit: 3 labels height (3 x 76.2 = 228.6mm) with gaps
+  const labelsPerRow = 3;
+  const labelsPerColumn = 3;
+  const labelsPerPage = labelsPerRow * labelsPerColumn;
+  
+  // Generate all barcodes first
+  const barcodePromises = products.map(async (product) => {
+    const barcodeData = product.sku || product._id;
+    const barcodeURL = await generateBarcodeDataURL(barcodeData, {
+      format: 'CODE128',
+      width: 2,
+      height: 80, // Taller barcode for 3 inch height (2 inch width x 3 inch height)
+      displayValue: true, // Show SKU below barcode
+    });
+    return { ...product, barcodeURL };
+  });
+
+  const productsWithBarcodes = await Promise.all(barcodePromises);
+
+  // Split products into pages
+  const pages: typeof productsWithBarcodes[] = [];
+  for (let i = 0; i < productsWithBarcodes.length; i += labelsPerPage) {
+    pages.push(productsWithBarcodes.slice(i, i + labelsPerPage));
+  }
+
+  const labelWidth = '50.8mm'; // 2 inches width
+  const labelHeight = '76.2mm'; // 3 inches height
+  const gap = '3mm';
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Barcode Labels - 2x3 Inch</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 5mm;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: white;
+      color: black;
+    }
+    .page {
+      width: 200mm;
+      height: 287mm;
+      display: grid;
+      grid-template-columns: repeat(${labelsPerRow}, ${labelWidth});
+      grid-template-rows: repeat(${labelsPerColumn}, ${labelHeight});
+      gap: ${gap};
+      padding: 0;
+      page-break-after: always;
+      page-break-inside: avoid;
+    }
+    .page:last-child {
+      page-break-after: auto;
+    }
+    .label {
+      width: ${labelWidth};
+      height: ${labelHeight};
+      padding: 3mm;
+      border: 1px solid #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      page-break-inside: avoid;
+      background: white;
+      box-sizing: border-box;
+    }
+    .sku {
+      font-size: 10px;
+      font-weight: bold;
+      text-align: center;
+      width: 100%;
+      margin-bottom: 2mm;
+      font-family: monospace;
+      color: #333;
+    }
+    .product-name {
+      font-size: 11px;
+      font-weight: bold;
+      text-align: center;
+      width: 100%;
+      margin-bottom: 3mm;
+      line-height: 1.3;
+      min-height: 12mm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      word-wrap: break-word;
+      overflow: hidden;
+    }
+    .barcode-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 3mm 0;
+      flex: 1;
+      min-height: 35mm;
+    }
+    .barcode-img {
+      max-width: 95%;
+      height: auto;
+      max-height: 40mm;
+      object-fit: contain;
+    }
+    .price {
+      font-size: 14px;
+      font-weight: bold;
+      text-align: center;
+      width: 100%;
+      margin-top: 2mm;
+      color: #000;
+    }
+    @media print {
+      body {
+        background: white !important;
+        margin: 0;
+        padding: 0;
+      }
+      .page {
+        page-break-inside: avoid !important;
+        height: 287mm !important;
+        width: 200mm !important;
+      }
+      .label {
+        border: 1px solid #000 !important;
+        page-break-inside: avoid !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  ${pages
+    .map(
+      (pageProducts) => `
+    <div class="page">
+      ${Array.from({ length: labelsPerPage })
+        .map((_, index) => {
+          const product = pageProducts[index];
+          if (!product) {
+            return '<div class="label"></div>';
+          }
+          return `
+        <div class="label">
+          <div class="sku">SKU: ${product.sku}</div>
+          <div class="product-name">${product.name}</div>
+          <div class="barcode-container">
+            <img src="${product.barcodeURL}" alt="Barcode" class="barcode-img" />
+          </div>
+          <div class="price">₹ ${product.sellingPrice.toFixed(2)}</div>
+        </div>
+      `;
+        })
+        .join('')}
+    </div>
+  `
+    )
+    .join('')}
+  <script>
+    window.onload = function() {
+      const images = document.querySelectorAll('img');
+      let loaded = 0;
+      if (images.length === 0) {
+        window.print();
+        return;
+      }
+      images.forEach(img => {
+        if (img.complete) {
+          loaded++;
+          if (loaded === images.length) {
+            setTimeout(() => window.print(), 300);
+          }
+        } else {
+          img.onload = () => {
+            loaded++;
+            if (loaded === images.length) {
+              setTimeout(() => window.print(), 300);
+            }
+          };
+          img.onerror = () => {
+            loaded++;
+            if (loaded === images.length) {
+              setTimeout(() => window.print(), 300);
+            }
+          };
+        }
+      });
+    };
+  </script>
+</body>
+</html>
+  `;
+}
+
+/**
  * Print barcodes - opens print dialog
  */
 export async function printBarcodes(
@@ -390,6 +606,8 @@ export async function printBarcodes(
     
     if (options.format === 'thermal') {
       html = await generateThermalPrintHTML(products, options);
+    } else if (options.format === '2x3inch') {
+      html = await generate2x3InchPrintHTML(products, options);
     } else {
       html = await generateNormalPrintHTML(products, options);
     }

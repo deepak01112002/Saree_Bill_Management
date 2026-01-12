@@ -8,8 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { productsAPI, billingAPI, customersAPI, settingsAPI } from '@/lib/api';
 import { formatCurrency } from '@/lib/utils';
-import { Search, Plus, Minus, Trash2, ShoppingCart, User, QrCode, FileText } from 'lucide-react';
+import { Search, Plus, Minus, Trash2, ShoppingCart, User, QrCode, FileText, ScanLine } from 'lucide-react';
 import { QRScanner } from '@/components/billing/QRScanner';
+import { BarcodeScanner } from '@/components/billing/BarcodeScanner';
 import { showToast } from '@/lib/toast';
 import { generateQuotationPDF } from '@/lib/pdf';
 
@@ -49,6 +50,7 @@ export default function BillingPage() {
   const [loading, setLoading] = useState(false);
   const [searching, setSearching] = useState(false);
   const [qrScannerOpen, setQrScannerOpen] = useState(false);
+  const [barcodeScannerOpen, setBarcodeScannerOpen] = useState(false);
   const [barcodeInput, setBarcodeInput] = useState('');
   const barcodeInputRef = useRef<HTMLInputElement | null>(null);
   const barcodeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -147,37 +149,57 @@ export default function BillingPage() {
 
   const handleBarcodeScan = async (scannedValue: string) => {
     try {
-      // Try to find product by SKU (barcode scanners usually scan SKU)
-      const result = await productsAPI.getAll({ search: scannedValue, limit: 5 });
-      const products = result.products || [];
-      
-      // Find exact SKU match first
-      let product = products.find((p: any) => p.sku === scannedValue || p.sku?.toLowerCase() === scannedValue.toLowerCase());
-      
-      // If no exact match, try partial match
-      if (!product && products.length > 0) {
-        product = products[0];
+      if (!scannedValue || scannedValue.trim() === '') {
+        return;
       }
-
-      if (product) {
-        // Fetch full product details to ensure we have GST percentage
-        try {
-          const fullProduct = await productsAPI.getById(product._id);
-          if (fullProduct) {
-            addToCart(fullProduct);
-          } else {
-            addToCart(product); // Fallback to search result
-          }
-        } catch (fetchError) {
-          // If fetch fails, use search result
+      
+      const trimmedValue = scannedValue.trim();
+      
+      // Use dedicated SKU API endpoint for faster and more accurate lookup
+      try {
+        const product = await productsAPI.getBySku(trimmedValue);
+        
+        if (product && product._id) {
+          // Product found by SKU - add to cart
           addToCart(product);
+          showToast.success(`Product "${product.name}" added to cart`);
+        } else {
+          showToast.error(`Product with SKU/Barcode "${trimmedValue}" not found`);
         }
-      } else {
-        showToast.error(`Product with SKU "${scannedValue}" not found`);
+      } catch (skuError: any) {
+        // If SKU lookup fails, try search as fallback
+        console.log('SKU lookup failed, trying search fallback:', skuError.message);
+        
+        try {
+          const result = await productsAPI.getAll({ search: trimmedValue, limit: 10 });
+          const products = result.products || [];
+          
+          // Find exact SKU match
+          let product = products.find((p: any) => 
+            p.sku && (p.sku === trimmedValue || p.sku.toLowerCase() === trimmedValue.toLowerCase())
+          );
+          
+          // Try barcode field
+          if (!product) {
+            product = products.find((p: any) => 
+              p.barcode && (p.barcode === trimmedValue || p.barcode.toLowerCase() === trimmedValue.toLowerCase())
+            );
+          }
+          
+          if (product) {
+            addToCart(product);
+            showToast.success(`Product "${product.name}" added to cart`);
+          } else {
+            showToast.error(`Product with SKU/Barcode "${trimmedValue}" not found`);
+          }
+        } catch (searchError: any) {
+          console.error('Search fallback also failed:', searchError);
+          showToast.error(`Product with SKU/Barcode "${trimmedValue}" not found`);
+        }
       }
     } catch (error: any) {
       console.error('Barcode scan error:', error);
-      showToast.error('Failed to process barcode scan');
+      showToast.error('Failed to process barcode scan: ' + (error.message || 'Unknown error'));
     }
   };
 
@@ -267,6 +289,11 @@ export default function BillingPage() {
 
   const handleQRScanSuccess = async (productData: { productId: string; sku: string; name: string; price: number }) => {
     try {
+      if (!productData || !productData.productId) {
+        showToast.error('Invalid product data. Please scan again.');
+        return;
+      }
+      
       // Fetch full product details to ensure it exists and get latest price
       const product = await productsAPI.getById(productData.productId);
       
@@ -279,47 +306,52 @@ export default function BillingPage() {
     } catch (error: any) {
       console.error('Error fetching product:', error);
       // If product fetch fails, try to add with scanned data (without GST info)
-      setCart((prevCart) => {
-        const existingItem = prevCart.find((item) => item.productId === productData.productId);
-        const gstPercentage = 0; // Default to 0 if product fetch fails
-        
-        if (existingItem) {
-          const newQuantity = existingItem.quantity + 1;
-          const { subtotal, gstAmount, totalWithGst } = calculateItemGst(existingItem.price, newQuantity, gstPercentage);
+      try {
+        setCart((prevCart) => {
+          const existingItem = prevCart.find((item) => item.productId === productData.productId);
+          const gstPercentage = 0; // Default to 0 if product fetch fails
           
-          return prevCart.map((item) =>
-            item.productId === productData.productId
-              ? { 
-                  ...item, 
-                  quantity: newQuantity, 
-                  total: subtotal,
-                  gstAmount,
-                  totalWithGst
-                }
-              : item
-          );
-        } else {
-          const { subtotal, gstAmount, totalWithGst } = calculateItemGst(productData.price, 1, gstPercentage);
-          
-          return [
-            ...prevCart,
-            {
-              productId: productData.productId,
-              productName: productData.name,
-              quantity: 1,
-              price: productData.price,
-              gstPercentage: gstPercentage,
-              total: subtotal,
-              gstAmount: gstAmount,
-              totalWithGst: totalWithGst,
-            },
-          ];
-        }
-      });
-      // Defer toast to avoid render-time state updates
-      setTimeout(() => {
-        showToast.success('Product added to cart');
-      }, 0);
+          if (existingItem) {
+            const newQuantity = existingItem.quantity + 1;
+            const { subtotal, gstAmount, totalWithGst } = calculateItemGst(existingItem.price, newQuantity, gstPercentage);
+            
+            return prevCart.map((item) =>
+              item.productId === productData.productId
+                ? { 
+                    ...item, 
+                    quantity: newQuantity, 
+                    total: subtotal,
+                    gstAmount,
+                    totalWithGst
+                  }
+                : item
+            );
+          } else {
+            const { subtotal, gstAmount, totalWithGst } = calculateItemGst(productData.price, 1, gstPercentage);
+            
+            return [
+              ...prevCart,
+              {
+                productId: productData.productId,
+                productName: productData.name,
+                quantity: 1,
+                price: productData.price,
+                gstPercentage: gstPercentage,
+                total: subtotal,
+                gstAmount: gstAmount,
+                totalWithGst: totalWithGst,
+              },
+            ];
+          }
+        });
+        // Defer toast to avoid render-time state updates
+        setTimeout(() => {
+          showToast.success(`Product "${productData.name}" added to cart`);
+        }, 0);
+      } catch (cartError: any) {
+        console.error('Error adding to cart:', cartError);
+        showToast.error('Failed to add product to cart. Please try again.');
+      }
     }
   };
 
@@ -595,19 +627,12 @@ export default function BillingPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => {
-                      if (barcodeInputRef.current) {
-                        barcodeInputRef.current.focus();
-                        setTimeout(() => {
-                          showToast.info('Barcode scanner ready. Scan a product barcode.');
-                        }, 0);
-                      }
-                    }}
-                    className="bg-green-50 border-green-300 text-green-700 hover:bg-green-100"
-                    title="Click to focus barcode scanner input (for external handheld scanners)"
+                    onClick={() => setBarcodeScannerOpen(true)}
+                    className="bg-purple-50 border-purple-300 text-purple-700 hover:bg-purple-100 dark:bg-purple-900/20 dark:border-purple-700 dark:text-purple-300"
+                    title="Open camera barcode scanner"
                   >
-                    <Search className="mr-2 h-4 w-4" />
-                    Barcode Scanner
+                    <ScanLine className="mr-2 h-4 w-4" />
+                    Scan Barcode
                   </Button>
                   <Button
                     variant="outline"
@@ -622,19 +647,25 @@ export default function BillingPage() {
               </div>
             </CardHeader>
             <CardContent>
-              {/* Hidden Barcode Scanner Input - For External Handheld Scanners */}
-              <Input
-                ref={barcodeInputRef}
-                type="text"
-                value={barcodeInput}
-                onChange={handleBarcodeInputChange}
-                onKeyDown={handleBarcodeInputKeyDown}
-                placeholder="Barcode scanner input (hidden - for external scanners)"
-                autoFocus
-                className="sr-only absolute opacity-0 pointer-events-none"
-                style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px' }}
-                tabIndex={-1}
-              />
+              {/* Barcode Scanner Input - For External Handheld Scanners */}
+              <div className="mb-4 p-3 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-lg">
+                <Label className="text-sm font-semibold text-green-800 dark:text-green-200 mb-2 block">
+                  Barcode Scanner (Test Mode)
+                </Label>
+                <Input
+                  ref={barcodeInputRef}
+                  type="text"
+                  value={barcodeInput}
+                  onChange={handleBarcodeInputChange}
+                  onKeyDown={handleBarcodeInputKeyDown}
+                  placeholder="Scan or type SKU/Barcode here to test..."
+                  autoFocus
+                  className="bg-white dark:bg-gray-800 border-green-300 dark:border-green-600 focus:ring-green-500"
+                />
+                <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+                  Use this field to test barcode scanning. External scanners will auto-fill here.
+                </p>
+              </div>
               
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -1086,6 +1117,20 @@ export default function BillingPage() {
       <QRScanner
         open={qrScannerOpen}
         onOpenChange={setQrScannerOpen}
+        onScanSuccess={handleQRScanSuccess}
+      />
+
+      {/* QR Scanner */}
+      <QRScanner
+        open={qrScannerOpen}
+        onOpenChange={setQrScannerOpen}
+        onScanSuccess={handleQRScanSuccess}
+      />
+
+      {/* Barcode Scanner */}
+      <BarcodeScanner
+        open={barcodeScannerOpen}
+        onOpenChange={setBarcodeScannerOpen}
         onScanSuccess={handleQRScanSuccess}
       />
     </div>

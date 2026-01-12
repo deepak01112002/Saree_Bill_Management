@@ -90,13 +90,20 @@ export default function LotDetailsPage() {
   const loadProducts = async () => {
     try {
       setProductsLoading(true);
-      const result = await lotsAPI.getProducts(lotId, { page, limit: 50 });
-      setProducts(result.products || []);
+      const result = await lotsAPI.getProducts(lotId, { page, limit: 100 }); // Increased limit
+      const loadedProducts = result.products || [];
+      setProducts(loadedProducts);
       setTotalProducts(result.total || 0);
       setTotalPages(result.pages || 1);
+      
+      // Debug log to check if products are loaded
+      if (loadedProducts.length === 0 && result.total > 0) {
+        console.warn('Products exist but not loaded. Total:', result.total, 'Page:', page);
+      }
     } catch (error: any) {
       console.error('Error loading products:', error);
       showToast.error('Failed to load products: ' + (error.message || 'Unknown error'));
+      setProducts([]); // Ensure products array is set even on error
     } finally {
       setProductsLoading(false);
     }

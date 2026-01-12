@@ -264,32 +264,32 @@ export default function BillViewPage() {
             overflow: visible !important;
           }
           
-          /* Company header */
+          /* Company header - compact */
           #invoice-content .border-b {
             border-bottom: 2px solid #3b82f6 !important;
-            padding-bottom: 15px !important;
-            margin-bottom: 20px !important;
+            padding-bottom: 8px !important;
+            margin-bottom: 10px !important;
           }
           
           /* Company name */
           #invoice-content h2 {
-            font-size: 20px !important;
+            font-size: 16px !important;
             font-weight: bold !important;
-            margin-bottom: 5px !important;
+            margin-bottom: 3px !important;
             color: black !important;
           }
           
           /* Website */
           #invoice-content .text-blue-600 {
             color: #3b82f6 !important;
-            font-size: 10px !important;
+            font-size: 8px !important;
           }
           
-          /* Invoice metadata */
+          /* Invoice metadata - compact */
           #invoice-content .border-t {
             border-top: 1px solid #e5e7eb !important;
-            padding-top: 15px !important;
-            margin-top: 15px !important;
+            padding-top: 8px !important;
+            margin-top: 8px !important;
           }
           
           /* Text colors - ensure readability */
@@ -303,13 +303,14 @@ export default function BillViewPage() {
             color: black !important;
           }
           
-          /* Table styling */
+          /* Table styling - compact for single page */
           #invoice-content table {
             width: 100% !important;
             border-collapse: collapse !important;
-            margin-top: 20px !important;
-            margin-bottom: 20px !important;
+            margin-top: 10px !important;
+            margin-bottom: 10px !important;
             page-break-inside: auto !important;
+            font-size: 8px !important;
           }
           
           /* Allow table rows to break across pages */
@@ -325,17 +326,17 @@ export default function BillViewPage() {
           }
           
           #invoice-content th {
-            padding: 8px !important;
+            padding: 4px !important;
             text-align: left !important;
             border-bottom: 1px solid #d1d5db !important;
             font-weight: bold !important;
-            font-size: 9px !important;
+            font-size: 7px !important;
           }
           
           #invoice-content td {
-            padding: 8px !important;
+            padding: 4px !important;
             border-bottom: 1px solid #e5e7eb !important;
-            font-size: 9px !important;
+            font-size: 7px !important;
           }
           
           /* Category headers */
@@ -375,9 +376,41 @@ export default function BillViewPage() {
             box-shadow: none !important;
           }
           
-          /* Ensure proper spacing */
+          /* Ensure proper spacing - compact for single page */
           #invoice-content .space-y-6 > * + * {
-            margin-top: 20px !important;
+            margin-top: 10px !important;
+          }
+          
+          /* Compact sections */
+          #invoice-content .mb-6 {
+            margin-bottom: 10px !important;
+          }
+          
+          #invoice-content .mt-6 {
+            margin-top: 10px !important;
+          }
+          
+          #invoice-content .pt-4 {
+            padding-top: 8px !important;
+          }
+          
+          /* Footer - compact */
+          #invoice-content .mt-8.pt-6.border-t.text-center {
+            margin-top: 15px !important;
+            padding-top: 10px !important;
+            font-size: 8px !important;
+          }
+          
+          #invoice-content .text-lg {
+            font-size: 12px !important;
+          }
+          
+          #invoice-content .text-sm {
+            font-size: 8px !important;
+          }
+          
+          #invoice-content .text-xs {
+            font-size: 7px !important;
           }
           
           /* QR codes - smaller in print */
@@ -443,7 +476,7 @@ export default function BillViewPage() {
 
       {/* Bill Content */}
       <Card id="invoice-content" className="border-0 shadow-md print:shadow-none print:border">
-        <CardContent className="p-8 print:p-6">
+        <CardContent className="p-8 print:p-4">
           {/* Company Logo & Header */}
           <div className="border-b pb-6 mb-6">
             <div className="flex justify-between items-start mb-4">
@@ -717,12 +750,11 @@ export default function BillViewPage() {
 
           {/* Footer */}
           <div className="mt-8 pt-6 border-t text-center">
-            <p className="text-lg font-semibold text-gray-900 mb-2">Thank you for your purchase!</p>
             <p className="text-sm text-blue-600 font-medium">{settings?.website || 'www.lapatola.com'}</p>
             {settings?.invoiceFooterNote && (
               <p className="text-xs text-gray-600 mt-2">{settings.invoiceFooterNote}</p>
             )}
-            <p className="text-xs text-gray-500 mt-2">For returns, please bring this invoice within 7 days</p>
+            <p className="text-xs text-gray-500 mt-2">For returns, please bring this invoice within 7 days.</p>
           </div>
         </CardContent>
       </Card>

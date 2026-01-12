@@ -40,6 +40,41 @@ export const getProducts = async (req: AuthRequest, res: Response) => {
   }
 };
 
+// Get product by SKU (for barcode scanning)
+export const getProductBySku = async (req: AuthRequest, res: Response) => {
+  try {
+    await connectDB();
+    const { sku } = req.params;
+    
+    if (!sku || sku.trim() === '') {
+      return res.status(400).json({ error: 'SKU is required' });
+    }
+    
+    // Find product by SKU (case-insensitive)
+    const product = await Product.findOne({ 
+      sku: { $regex: new RegExp(`^${sku.trim()}$`, 'i') } 
+    }).populate('category', 'name code');
+    
+    if (!product) {
+      // Also try barcode field if SKU doesn't match
+      const productByBarcode = await Product.findOne({
+        barcode: { $regex: new RegExp(`^${sku.trim()}$`, 'i') }
+      }).populate('category', 'name code');
+      
+      if (productByBarcode) {
+        return res.json(productByBarcode);
+      }
+      
+      return res.status(404).json({ error: 'Product not found with this SKU/Barcode' });
+    }
+    
+    res.json(product);
+  } catch (error: any) {
+    console.error('Error fetching product by SKU:', error);
+    res.status(500).json({ error: error.message || 'Failed to fetch product' });
+  }
+};
+
 export const getProduct = async (req: AuthRequest, res: Response) => {
   try {
     await connectDB();

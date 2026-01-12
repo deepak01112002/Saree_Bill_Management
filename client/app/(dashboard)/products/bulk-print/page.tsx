@@ -20,7 +20,7 @@ export default function BulkBarcodePrintPage() {
   const [loading, setLoading] = useState(true);
   const [printing, setPrinting] = useState(false);
   const [search, setSearch] = useState('');
-  const [printFormat, setPrintFormat] = useState<PrintFormat>('normal');
+  const [printFormat, setPrintFormat] = useState<PrintFormat>('2x3inch');
   const [paperWidth, setPaperWidth] = useState<'58mm' | '80mm'>('58mm');
   const [columns, setColumns] = useState(4);
   const [labelsPerPage, setLabelsPerPage] = useState(24);
@@ -137,17 +137,17 @@ export default function BulkBarcodePrintPage() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label>Print Format *</Label>
-            <div className="flex gap-4">
+            <div className="flex flex-col gap-2">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="radio"
                   name="format"
-                  value="thermal"
-                  checked={printFormat === 'thermal'}
+                  value="2x3inch"
+                  checked={printFormat === '2x3inch'}
                   onChange={(e) => setPrintFormat(e.target.value as PrintFormat)}
                   className="w-4 h-4"
                 />
-                <span>Thermal Printer (58mm/80mm)</span>
+                <span>2x3 Inch (SKU, Name, Price)</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -159,6 +159,17 @@ export default function BulkBarcodePrintPage() {
                   className="w-4 h-4"
                 />
                 <span>Normal Printer (Multiple per page)</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="format"
+                  value="thermal"
+                  checked={printFormat === 'thermal'}
+                  onChange={(e) => setPrintFormat(e.target.value as PrintFormat)}
+                  className="w-4 h-4"
+                />
+                <span>Thermal Printer (58mm/80mm)</span>
               </label>
             </div>
           </div>

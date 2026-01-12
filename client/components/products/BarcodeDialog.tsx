@@ -31,7 +31,7 @@ export function BarcodeDialog({ open, onOpenChange, product }: BarcodeDialogProp
   const [barcodeDataURL, setBarcodeDataURL] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [printing, setPrinting] = useState(false);
-  const [printFormat, setPrintFormat] = useState<PrintFormat>('normal');
+  const [printFormat, setPrintFormat] = useState<PrintFormat>('2x3inch');
   const [paperWidth, setPaperWidth] = useState<'58mm' | '80mm'>('58mm');
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -51,7 +51,7 @@ export function BarcodeDialog({ open, onOpenChange, product }: BarcodeDialogProp
       const dataURL = await generateBarcodeDataURL(barcodeData, {
         format: 'CODE128',
         width: 2,
-        height: 100,
+        height: 80, // Consistent with bulk format (2 inch width x 3 inch height)
         displayValue: true,
       });
       setBarcodeDataURL(dataURL);
@@ -63,13 +63,103 @@ export function BarcodeDialog({ open, onOpenChange, product }: BarcodeDialogProp
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!barcodeDataURL || !product) return;
 
-    const link = document.createElement('a');
-    link.download = `Barcode-${product.sku}-${product.name.replace(/\s/g, '-')}.png`;
-    link.href = barcodeDataURL;
-    link.click();
+    try {
+      // Create a canvas matching bulk barcode format (2 inch width x 3 inch height)
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // Set canvas size: 2 inch width x 3 inch height at 300 DPI
+      // 2 inch = 50.8mm = 600px at 300 DPI
+      // 3 inch = 76.2mm = 900px at 300 DPI
+      const width = 600; // 2 inches at 300 DPI
+      const height = 900; // 3 inches at 300 DPI
+      canvas.width = width;
+      canvas.height = height;
+
+      // White background
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, width, height);
+
+      // Load barcode image
+      const barcodeImg = new Image();
+      barcodeImg.src = barcodeDataURL;
+      
+      await new Promise((resolve, reject) => {
+        barcodeImg.onload = resolve;
+        barcodeImg.onerror = reject;
+      });
+
+      // Calculate positions matching bulk format
+      const padding = 15; // 3mm equivalent
+      const topSectionHeight = 100; // Space for SKU, name, and MRP
+      const barcodeAreaHeight = height - topSectionHeight - (padding * 2);
+      const barcodeWidth = width - (padding * 2);
+      const barcodeHeight = Math.min(barcodeAreaHeight, barcodeImg.height * (barcodeWidth / barcodeImg.width));
+
+      // Draw SKU (top, monospace, bold)
+      ctx.fillStyle = '#333333';
+      ctx.font = 'bold 10px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText(`SKU: ${product.sku}`, width / 2, padding + 5);
+
+      // Draw product name (center, bold, wrapped)
+      ctx.fillStyle = '#000000';
+      ctx.font = 'bold 11px Arial';
+      const maxWidth = width - (padding * 2);
+      const productName = product.name;
+      const words = productName.split(' ');
+      let line = '';
+      let y = padding + 25;
+      
+      for (let i = 0; i < words.length; i++) {
+        const testLine = line + words[i] + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && i > 0) {
+          ctx.fillText(line, width / 2, y);
+          line = words[i] + ' ';
+          y += 14;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, width / 2, y);
+
+      // Draw barcode (center, larger)
+      const barcodeX = padding;
+      const barcodeY = topSectionHeight + padding;
+      ctx.drawImage(barcodeImg, barcodeX, barcodeY, barcodeWidth, barcodeHeight);
+
+      // Draw MRP (bottom, bold, large)
+      ctx.font = 'bold 14px Arial';
+      ctx.fillStyle = '#000000';
+      const mrpY = height - padding - 20;
+      ctx.fillText(`MRP: ₹${product.sellingPrice.toFixed(2)}`, width / 2, mrpY);
+
+      // Convert to blob and download
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = `Barcode-${product.sku}-${product.name.replace(/\s/g, '-')}.png`;
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+        showToast.success('Barcode downloaded with product details!');
+      }, 'image/png');
+    } catch (error) {
+      console.error('Error creating barcode image:', error);
+      // Fallback to simple download
+      const link = document.createElement('a');
+      link.download = `Barcode-${product.sku}-${product.name.replace(/\s/g, '-')}.png`;
+      link.href = barcodeDataURL;
+      link.click();
+      showToast.error('Failed to create complete barcode. Downloaded basic barcode.');
+    }
   };
 
   const handlePrint = async () => {
@@ -140,7 +230,18 @@ export function BarcodeDialog({ open, onOpenChange, product }: BarcodeDialogProp
           {/* Print Format Selection */}
           <div className="border-t pt-4 space-y-3">
             <Label className="text-sm font-semibold">Print Format</Label>
-            <div className="flex gap-4">
+            <div className="flex flex-col gap-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="dialog-format"
+                  value="2x3inch"
+                  checked={printFormat === '2x3inch'}
+                  onChange={(e) => setPrintFormat(e.target.value as PrintFormat)}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm">2x3 Inch (SKU, Name, Price)</span>
+              </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="radio"

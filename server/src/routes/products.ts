@@ -3,6 +3,7 @@ import { authenticate } from '../middleware/auth';
 import {
   getProducts,
   getProduct,
+  getProductBySku,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -14,6 +15,7 @@ import {
 const router = express.Router();
 
 router.get('/', authenticate, getProducts);
+router.get('/sku/:sku', authenticate, getProductBySku); // Must be before /:id route
 router.get('/:id', authenticate, getProduct);
 router.post('/', authenticate, createProduct);
 router.post('/upload', authenticate, uploadProductsFromExcel);

@@ -51,6 +51,8 @@ export default function ProductsPage() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     loadProducts();
@@ -98,6 +100,53 @@ export default function ProductsPage() {
       loadProducts();
     } catch (error: any) {
       showToast.error('Failed to delete product: ' + (error.message || 'Unknown error'));
+    }
+  };
+
+  const toggleProductSelection = (productId: string) => {
+    setSelectedProducts((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(productId)) {
+        newSet.delete(productId);
+      } else {
+        newSet.add(productId);
+      }
+      return newSet;
+    });
+  };
+
+  const selectAllProducts = () => {
+    if (selectedProducts.size === products.length) {
+      setSelectedProducts(new Set());
+    } else {
+      setSelectedProducts(new Set(products.map((p) => p._id)));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedProducts.size === 0) {
+      showToast.error('Please select at least one product to delete');
+      return;
+    }
+
+    const confirmed = await showConfirm(
+      `Are you sure you want to delete ${selectedProducts.size} product(s)? This action cannot be undone.`
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setDeleting(true);
+      const deletePromises = Array.from(selectedProducts).map((id) => productsAPI.delete(id));
+      await Promise.all(deletePromises);
+      showToast.success(`${selectedProducts.size} product(s) deleted successfully`);
+      setSelectedProducts(new Set());
+      loadProducts();
+    } catch (error: any) {
+      showToast.error('Failed to delete products: ' + (error.message || 'Unknown error'));
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -172,8 +221,28 @@ export default function ProductsPage() {
       {/* Products Table */}
       <Card className="border-0 shadow-md">
         <CardHeader>
-          <CardTitle>All Products ({total})</CardTitle>
-          <CardDescription>List of all products in your inventory</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>All Products ({total})</CardTitle>
+              <CardDescription>List of all products in your inventory</CardDescription>
+            </div>
+            {selectedProducts.size > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {selectedProducts.size} selected
+                </span>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleBulkDelete}
+                  disabled={deleting}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  {deleting ? 'Deleting...' : `Delete (${selectedProducts.size})`}
+                </Button>
+              </div>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -203,6 +272,14 @@ export default function ProductsPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b dark:border-gray-700">
+                      <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300 w-12">
+                        <input
+                          type="checkbox"
+                          checked={products.length > 0 && selectedProducts.size === products.length}
+                          onChange={selectAllProducts}
+                          className="w-4 h-4 rounded border-gray-300 dark:border-gray-600"
+                        />
+                      </th>
                       <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Product</th>
                       <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Type</th>
                       <th className="text-left p-4 font-semibold text-gray-700 dark:text-gray-300">Brand</th>
@@ -217,6 +294,14 @@ export default function ProductsPage() {
                   <tbody>
                     {products.map((product) => (
                       <tr key={product._id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                        <td className="p-4">
+                          <input
+                            type="checkbox"
+                            checked={selectedProducts.has(product._id)}
+                            onChange={() => toggleProductSelection(product._id)}
+                            className="w-4 h-4 rounded border-gray-300 dark:border-gray-600"
+                          />
+                        </td>
                         <td className="p-4">
                           <div>
                             <p className="font-medium text-gray-900 dark:text-white">{product.name}</p>
