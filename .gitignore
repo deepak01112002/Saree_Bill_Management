@@ -1,7 +1,0 @@
-# Node
-node_modules/
-.env
-.env.*
-.next/
-dist/
-build/

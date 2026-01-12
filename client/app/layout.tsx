@@ -15,13 +15,20 @@ const geistMono = Geist_Mono({
 
 // Get base URL from environment or use default
 const getBaseUrl = () => {
+  // Use explicit base URL if provided
+  if (process.env.NEXT_PUBLIC_BASE_URL) {
+    return process.env.NEXT_PUBLIC_BASE_URL;
+  }
+  // Fallback to API URL without /api
   if (process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL.replace('/api', '');
   }
+  // Vercel deployment
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
-  return 'http://localhost:3000';
+  // Default for local development
+  return process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
 };
 
 export const metadata: Metadata = {

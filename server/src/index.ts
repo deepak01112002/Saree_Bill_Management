@@ -29,10 +29,14 @@ import rollPolishRoutes from './routes/rollPolish';
 const app = express();
 const PORT = process.env.PORT || 5001; // Changed to 5001 to avoid AirPlay conflict
 
-// CORS Configuration - Simple and permissive for development
-// IMPORTANT: This allows all origins - ONLY for development!
+// CORS Configuration - Production ready
+const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5000';
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
 const corsOptions = {
-  origin: true, // Allow all origins in development
+  origin: isDevelopment 
+    ? true // Allow all origins in development
+    : CLIENT_URL.split(',').map(url => url.trim()), // Specific origins in production
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
@@ -47,11 +51,18 @@ app.use(cors(corsOptions));
 app.use((req, res, next) => {
   // Set CORS headers for all responses
   const origin = req.headers.origin;
+  const allowedOrigins = isDevelopment 
+    ? '*' // Allow all in development
+    : CLIENT_URL.split(',').map(url => url.trim()); // Specific origins in production
+  
   if (origin) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else {
+    if (isDevelopment || allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+  } else if (isDevelopment) {
     res.setHeader('Access-Control-Allow-Origin', '*');
   }
+  
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
