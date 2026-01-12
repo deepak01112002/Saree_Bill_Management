@@ -379,20 +379,20 @@ export async function generateNormalPrintHTML(
 }
 
 /**
- * Generate HTML for 2 inch x 3 inch barcode labels
+ * Generate HTML for 3 inch x 2 inch barcode labels
  * Shows: SKU, Product Name, Price, Barcode
  */
 export async function generate2x3InchPrintHTML(
   products: BarcodePrintProduct[],
   options: PrintOptions = { format: '2x3inch' }
 ): Promise<string> {
-  // 2 inch = 50.8mm, 3 inch = 76.2mm
+  // 3 inch = 76.2mm (width), 2 inch = 50.8mm (height)
   // A4 page: 210mm x 297mm
   // With 5mm margins: 200mm x 287mm available
-  // Can fit: 3 labels width (3 x 50.8 = 152.4mm) with gaps
-  // Can fit: 3 labels height (3 x 76.2 = 228.6mm) with gaps
-  const labelsPerRow = 3;
-  const labelsPerColumn = 3;
+  // Can fit: 2 labels width (2 x 76.2 = 152.4mm) with gaps
+  // Can fit: 5 labels height (5 x 50.8 = 254mm) with gaps
+  const labelsPerRow = 2;
+  const labelsPerColumn = 5;
   const labelsPerPage = labelsPerRow * labelsPerColumn;
   
   // Generate all barcodes first
@@ -400,8 +400,8 @@ export async function generate2x3InchPrintHTML(
     const barcodeData = product.sku || product._id;
     const barcodeURL = await generateBarcodeDataURL(barcodeData, {
       format: 'CODE128',
-      width: 2,
-      height: 80, // Taller barcode for 3 inch height (2 inch width x 3 inch height)
+      width: 3, // Wider barcode for 3 inch width
+      height: 50, // Shorter barcode for 2 inch height (3 inch width x 2 inch height)
       displayValue: true, // Show SKU below barcode
     });
     return { ...product, barcodeURL };
@@ -415,8 +415,8 @@ export async function generate2x3InchPrintHTML(
     pages.push(productsWithBarcodes.slice(i, i + labelsPerPage));
   }
 
-  const labelWidth = '50.8mm'; // 2 inches width
-  const labelHeight = '76.2mm'; // 3 inches height
+  const labelWidth = '76.2mm'; // 3 inches width
+  const labelHeight = '50.8mm'; // 2 inches height
   const gap = '3mm';
 
   return `
@@ -424,7 +424,7 @@ export async function generate2x3InchPrintHTML(
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Barcode Labels - 2x3 Inch</title>
+  <title>Barcode Labels - 3x2 Inch</title>
   <style>
     @page {
       size: A4;
@@ -457,7 +457,7 @@ export async function generate2x3InchPrintHTML(
     .label {
       width: ${labelWidth};
       height: ${labelHeight};
-      padding: 3mm;
+      padding: 2mm;
       border: 1px solid #000;
       display: flex;
       flex-direction: column;
@@ -468,22 +468,22 @@ export async function generate2x3InchPrintHTML(
       box-sizing: border-box;
     }
     .sku {
+      font-size: 9px;
+      font-weight: bold;
+      text-align: center;
+      width: 100%;
+      margin-bottom: 1mm;
+      font-family: monospace;
+      color: #333;
+    }
+    .product-name {
       font-size: 10px;
       font-weight: bold;
       text-align: center;
       width: 100%;
       margin-bottom: 2mm;
-      font-family: monospace;
-      color: #333;
-    }
-    .product-name {
-      font-size: 11px;
-      font-weight: bold;
-      text-align: center;
-      width: 100%;
-      margin-bottom: 3mm;
-      line-height: 1.3;
-      min-height: 12mm;
+      line-height: 1.2;
+      min-height: 8mm;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -495,22 +495,22 @@ export async function generate2x3InchPrintHTML(
       display: flex;
       justify-content: center;
       align-items: center;
-      margin: 3mm 0;
+      margin: 2mm 0;
       flex: 1;
-      min-height: 35mm;
+      min-height: 25mm;
     }
     .barcode-img {
       max-width: 95%;
       height: auto;
-      max-height: 40mm;
+      max-height: 30mm;
       object-fit: contain;
     }
     .price {
-      font-size: 14px;
+      font-size: 12px;
       font-weight: bold;
       text-align: center;
       width: 100%;
-      margin-top: 2mm;
+      margin-top: 1mm;
       color: #000;
     }
     @media print {

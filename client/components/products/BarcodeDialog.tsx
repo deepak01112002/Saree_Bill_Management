@@ -51,7 +51,7 @@ export function BarcodeDialog({ open, onOpenChange, product }: BarcodeDialogProp
       const dataURL = await generateBarcodeDataURL(barcodeData, {
         format: 'CODE128',
         width: 2,
-        height: 80, // Consistent with bulk format (2 inch width x 3 inch height)
+        height: 50, // Consistent with bulk format (3 inch width x 2 inch height)
         displayValue: true,
       });
       setBarcodeDataURL(dataURL);
@@ -67,16 +67,16 @@ export function BarcodeDialog({ open, onOpenChange, product }: BarcodeDialogProp
     if (!barcodeDataURL || !product) return;
 
     try {
-      // Create a canvas matching bulk barcode format (2 inch width x 3 inch height)
+      // Create a canvas matching bulk barcode format (3 inch width x 2 inch height)
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      // Set canvas size: 2 inch width x 3 inch height at 300 DPI
-      // 2 inch = 50.8mm = 600px at 300 DPI
+      // Set canvas size: 3 inch width x 2 inch height at 300 DPI
       // 3 inch = 76.2mm = 900px at 300 DPI
-      const width = 600; // 2 inches at 300 DPI
-      const height = 900; // 3 inches at 300 DPI
+      // 2 inch = 50.8mm = 600px at 300 DPI
+      const width = 900; // 3 inches at 300 DPI
+      const height = 600; // 2 inches at 300 DPI
       canvas.width = width;
       canvas.height = height;
 
@@ -93,28 +93,29 @@ export function BarcodeDialog({ open, onOpenChange, product }: BarcodeDialogProp
         barcodeImg.onerror = reject;
       });
 
-      // Calculate positions matching bulk format
+      // Calculate positions matching bulk format (3 inch width x 2 inch height)
       const padding = 15; // 3mm equivalent
-      const topSectionHeight = 100; // Space for SKU, name, and MRP
-      const barcodeAreaHeight = height - topSectionHeight - (padding * 2);
+      const topSectionHeight = 80; // Space for SKU, name (reduced for shorter height)
+      const bottomSectionHeight = 50; // Space for MRP
+      const barcodeAreaHeight = height - topSectionHeight - bottomSectionHeight - (padding * 2);
       const barcodeWidth = width - (padding * 2);
       const barcodeHeight = Math.min(barcodeAreaHeight, barcodeImg.height * (barcodeWidth / barcodeImg.width));
 
       // Draw SKU (top, monospace, bold)
       ctx.fillStyle = '#333333';
-      ctx.font = 'bold 10px monospace';
+      ctx.font = 'bold 9px monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
-      ctx.fillText(`SKU: ${product.sku}`, width / 2, padding + 5);
+      ctx.fillText(`SKU: ${product.sku}`, width / 2, padding + 3);
 
-      // Draw product name (center, bold, wrapped)
+      // Draw product name (center, bold, wrapped) - adjusted for wider format
       ctx.fillStyle = '#000000';
-      ctx.font = 'bold 11px Arial';
+      ctx.font = 'bold 10px Arial';
       const maxWidth = width - (padding * 2);
       const productName = product.name;
       const words = productName.split(' ');
       let line = '';
-      let y = padding + 25;
+      let y = padding + 18;
       
       for (let i = 0; i < words.length; i++) {
         const testLine = line + words[i] + ' ';
@@ -122,22 +123,22 @@ export function BarcodeDialog({ open, onOpenChange, product }: BarcodeDialogProp
         if (metrics.width > maxWidth && i > 0) {
           ctx.fillText(line, width / 2, y);
           line = words[i] + ' ';
-          y += 14;
+          y += 12;
         } else {
           line = testLine;
         }
       }
       ctx.fillText(line, width / 2, y);
 
-      // Draw barcode (center, larger)
+      // Draw barcode (center, wider)
       const barcodeX = padding;
       const barcodeY = topSectionHeight + padding;
       ctx.drawImage(barcodeImg, barcodeX, barcodeY, barcodeWidth, barcodeHeight);
 
       // Draw MRP (bottom, bold, large)
-      ctx.font = 'bold 14px Arial';
+      ctx.font = 'bold 12px Arial';
       ctx.fillStyle = '#000000';
-      const mrpY = height - padding - 20;
+      const mrpY = height - padding - 10;
       ctx.fillText(`MRP: ₹${product.sellingPrice.toFixed(2)}`, width / 2, mrpY);
 
       // Convert to blob and download
