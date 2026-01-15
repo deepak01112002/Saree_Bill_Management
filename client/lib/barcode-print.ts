@@ -381,140 +381,148 @@ export async function generateNormalPrintHTML(
 /**
  * Generate HTML for 3 inch x 2 inch barcode labels
  * Shows: SKU, Product Name, Price, Barcode
- */
-export async function generate2x3InchPrintHTML(
-  products: BarcodePrintProduct[],
+ * 
   options: PrintOptions = { format: '2x3inch' }
-): Promise<string> {
-
-  const barcodePromises = products.map(async (product) => {
-    const barcodeURL = await generateBarcodeDataURL(product.sku || product._id, {
-      format: 'CODE128',
-      width: 6,          // thick bars
-      height: 140,       // tall barcode
-      displayValue: false,
+ */
+  export async function generate2x3InchPrintHTML(
+    products: BarcodePrintProduct[],
+    options: PrintOptions = { format: '2x3inch' }
+  ): Promise<string> {
+  
+    const barcodePromises = products.map(async (product) => {
+      const barcodeURL = await generateBarcodeDataURL(product.sku || product._id, {
+        format: 'CODE128',
+        width: 3,        // thinner bars (important after rotation)
+        height: 140,     // long barcode
+        displayValue: false,
+      });
+      return { ...product, barcodeURL };
     });
-    return { ...product, barcodeURL };
-  });
-
-  const productsWithBarcodes = await Promise.all(barcodePromises);
-
-  return `
-<!DOCTYPE html>
-<html>
-<head>
+  
+    const productsWithBarcodes = await Promise.all(barcodePromises);
+  
+    return `
+  <!DOCTYPE html>
+  <html>
+  <head>
   <meta charset="UTF-8" />
   <style>
     @page {
-      size: 76.2mm 177.8mm; 
-      margin-top: 5mm;     
-      margin-left: 0;
-      margin-right: 0;
-      margin-bottom: 0;
+      size: 50mm 75mm;   /* 2 × 3 inch paper */
+      margin: 0;
     }
-
-    body {
+  
+    html, body {
+      width: 50mm;
+      height: 75mm;
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
     }
-
-    .label {
-      width: 76.2mm;
-      height: 30.8mm;
-      padding: 2mm;
+  
+    /* PAGE */
+    .page {
+      width: 50mm;
+      height: 75mm;
       display: flex;
-      flex-direction: column;
-      box-sizing: border-box;
-      border: 1px solid #000;
-      page-break-inside: avoid;
+      align-items: center;
+      justify-content: center;
+      page-break-after: always;
     }
-
-    .label:last-child {
+  
+    .page:last-child {
       page-break-after: auto;
     }
-
+  
+    /* ROTATED LABEL */
+    .label {
+      width: 75mm;      /* swapped */
+      height: 50mm;
+      border: 1px solid #000;
+      padding: 2mm;
+      box-sizing: border-box;
+      background: #fff;
+  
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+  
+      transform: rotate(90deg);
+      transform-origin: center;
+    }
+  
     .name {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: bold;
       text-align: center;
-      margin-bottom: 1mm;
+      margin-bottom: 2mm;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
+  
     .barcode-container {
       flex: 1;
       display: flex;
-      align-items: stretch;
+      align-items: center;
       justify-content: center;
     }
-
+  
     .barcode-container img {
       width: 100%;
-      height: 100%;
+      height: auto;
+      max-height: 30mm;
       object-fit: contain;
     }
-
+  
     .bottom {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 1mm;
+      margin-top: 2mm;
     }
-
+  
     .sku {
+      font-size: 9px;
+      font-weight: bold;
+    }
+  
+    .price {
       font-size: 10px;
       font-weight: bold;
     }
-
-    .price {
-      font-size: 11px;
-      font-weight: bold;
-    }
-    @media print {
-      .label {
-        page-break-inside: avoid;
-      }
-
-      /* Force page break AFTER every 3rd label */
-      .label:nth-child(3n) {
-        page-break-after: always;
-      }
-
-      /* Prevent extra blank page at end */
-      .label:last-child {
-        page-break-after: auto;
-      }
-    }
-
   </style>
-</head>
-
-<body>
+  </head>
+  
+  <body>
   ${productsWithBarcodes.map(p => `
-    <div class="label">
-      <div class="name">${p.name}</div>
-
-      <div class="barcode-container">
-        <img src="${p.barcodeURL}" />
-      </div>
-
-      <div class="bottom">
-        <span class="sku">SKU: ${p.sku}</span>
-        <span class="price">₹${p.sellingPrice.toFixed(2)}</span>
+    <div class="page">
+      <div class="label">
+        <div class="name">${p.name}</div>
+  
+        <div class="barcode-container">
+          <img src="${p.barcodeURL}" />
+        </div>
+  
+        <div class="bottom">
+          <span class="sku">SKU: ${p.sku}</span>
+          <span class="price">₹${p.sellingPrice.toFixed(2)}</span>
+        </div>
       </div>
     </div>
   `).join('')}
-
+  
   <script>
     window.onload = () => window.print();
   </script>
-</body>
-</html>
-`;
-}
+  </body>
+  </html>
+  `;
+  }
+  
+  
+
+
 
 
 /**
